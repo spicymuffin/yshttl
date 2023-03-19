@@ -32,7 +32,7 @@ SUN
 
 
 class Route:
-    def __init__(self, _origin, _departure_datetime, _seats_available, _handle):
+    def __init__(self, _origin, _departure_datetime, _seats_available=-1, _handle=-1):
         self.origin = _origin
         self.departure_datetime = _departure_datetime
         self.seats_available = _seats_available
@@ -49,51 +49,73 @@ def cinput(indent=False):
     else:
         return input("    <<< ")
 
-
-class DestinationArgFormatError():
-    pass
-
-class TimeArgFormatError():
-    pass
-
-class DateArgFormatError():
-    pass
-
 # route origin (si/so) date max allowed dep time
 # arg format: xx mmdd h:m
+# ex:
+# book si 140623 24:00
+
+
 def book_handler(args):
+    args_processed = book_error_handler(args)
+    if type(args_processed) == str:
+        cprint(f"request couldnt be fullfilled: {args_processed}")
+    else:
+        r = Route(args_processed[0], args_processed[1])
+        BOOK_QUEUE.append(r)
+        cprint(f"route was added to wishlist successfully")
+
+
+def book_error_handler(args):
     try:
-        y = -1
-        m = -1
-        d = -1
-        h = -1
-        m = -1
-        # parse args
-        if args[1] == "si" or "so":
+        today_date = datetime.date.today()
+        year = -1
+        month = -1
+        day = -1
+        hour = -1
+        minute = -1
+        origin = "xx"
+
+        # parse args sinchon songdo
+        if args[1] == "so" or "si":
             origin = args[1]
         else:
-            raise DestinationArgFormatError
+            return "DestinationArgFormatError"
 
         try:
-            m = args[2][0:2]
-            d = args[2][2:4]
+            if len(args[2]) == 4:
+                month = args[2][0:2]
+                day = args[2][2:4]
+                if today_date.month < month:
+                    year = today_date.year + 1
+                else:
+                    year = today_date.year
+
+            elif len(args[2]) == 6:
+                month = args[2][0:2]
+                day = args[2][2:4]
+                year = int("20" + args[2][4:6])
+            else:
+                return "DateArgFormatError"
         except:
-            raise DateArgFormatError
+            return "DateArgFormatError"
 
         try:
             splt = args[3].split(":")
-            t = splt[0]
-            m = splt[1]
+            hour = splt[0]
+            minute = splt[1]
         except:
-            raise TimeArgFormatError
+            return "TimeArgFormatError"
 
-        # construct route object
+        try:
+            date_time = datetime.datetime(int(year), int(
+                month), int(day), int(hour), int(minute))
+            if date_time < datetime.datetime.now():
+                return "InvalidTimeError: DateTime has passed"
+            else:
+                return [origin, date_time]
+        except Exception as ex:
+            return f"InvalidTimeError: DateTime invaild {ex}"
 
-        td = datetime.date.today()
-        if td.month < m:
-            y = td.year + 1
-        else:
-            y = td.year
     except Exception as ex:
         cprint(f"request couldnt be fullfilled: {ex}")
 
