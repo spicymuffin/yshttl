@@ -19,6 +19,7 @@ if not os.path.exists(CONFIG_FILE_PATH):
 
 # we need a system to set a schedule:
 # timetable in config file:
+
 """
 MON si dep 8:00
 TUE
