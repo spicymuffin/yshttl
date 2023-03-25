@@ -9,17 +9,19 @@ import requests
 # https://portal.yonsei.ac.kr/SSOLegacy.do
 
 # region constants
-
 S1_pad = len('S1"         value="')
 S1_len = len('34175A69027670C2C2B2ED852C9E1E2BD357330DE5A3D487CC24BC7324F8446B1FC345098B59C7FA28BB41737D7E5A545BA85F7B7116C9148E74EA7D515587FBECA9653CB01D8F985C7BE7052E004505AA3DA0EC4822C5BE3E348640C138612A0BBCDA1FA0532F06AD0F3D0BEC3B8CF61AFE9F6F340A606021C503323FD553EDA561838AA63D92827897AB91B4FF380C41B3E1DA45B2AC55740C9757F398575FC08634B168B580B2A6B906090AE5D007DD7F2A062B63FBCFED0A10F3D103B4B2C9E07255D2659B63E3E624F37986E902A02720AAF914BD027A6D437A0017A6EF2F052470888FC59DE716D61105F8DD92F35EAEDFD682F189735C04356829BE50')
 
-RSAPublicKey2_pad = len("', '")
-RSAPublicKey2_len = len("10001")
+JSESSIONID_cookie_name = "JSESSIONID"
+__smVisitorID_cookie_name = "__smVisitorID"
 
 ssoChallenge_pad = len("var ssoChallenge= '")
 
+PRINT_DISSECT_VALS = False
+# endregion
 
-spLogin_request_data = {
+# region spLoginjsp_request data
+spLoginjsp_request_data = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Connection': 'keep-alive',
@@ -33,38 +35,35 @@ spLogin_request_data = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
+# endregion
 
-spLogin_request = requests.get(
-    'https://portal.yonsei.ac.kr/passni/spLogin.jsp', headers=spLogin_request_data)
+spLoginjsp_request = requests.get(
+    'https://portal.yonsei.ac.kr/passni/spLogin.jsp', headers=spLoginjsp_request_data)
 
-s = spLogin_request.headers["Set-Cookie"]
-# print(s)
-# print(PmSSOAuthService_request.content.decode())
-# print(PmSSOAuthService_request.headers)
-# find cookie vals
-__smVisitorID1_cookie_name = "__smVisitorID"
-__smVisitorID1 = ""
-index = s.rfind(__smVisitorID1_cookie_name) + \
-    len(__smVisitorID1_cookie_name) + 1  # this is a mess sorry
+# region dissect spLoginjsp_request
+s = spLoginjsp_request.headers["Set-Cookie"]
+__smVisitorID_main = ""
+index = s.rfind(__smVisitorID_cookie_name) + \
+    len(__smVisitorID_cookie_name) + 1  # this is a mess sorry
 while (s[index] != ';'):
-    __smVisitorID1 += s[index]
+    __smVisitorID_main += s[index]
     index += 1
 
-JSESSIONID1_cookie_name = "JSESSIONID"
-JSESSIONID1 = ""
-index = s.find(JSESSIONID1_cookie_name) + \
-    len(JSESSIONID1_cookie_name) + 1  # this is a mess sorry
+JSESSIONID_main = ""
+index = s.find(JSESSIONID_cookie_name) + \
+    len(JSESSIONID_cookie_name) + 1  # this is a mess sorry
 while (s[index] != ';'):
-    JSESSIONID1 += s[index]
+    JSESSIONID_main += s[index]
     index += 1
+# endregion
 
-
-SSOLegacy_request1_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+# region SSOLegacydo_prelogin_request data
+SSOLegacydo_prelogin_request_cookies = {
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
-SSOLegacy_request1_headers = {
+SSOLegacy_prelogin_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
@@ -83,23 +82,26 @@ SSOLegacy_request1_headers = {
     'sec-ch-ua-platform': '"Windows"',
 }
 
-SSOLegacy_request1_data = {
+SSOLegacy_prelogin_request_data = {
     'retUrl': '',
     'failUrl': '',
     'ssoGubun': 'Redirect',
     'a': 'aaaa',
     'b': 'bbbb',
 }
+# endregion
 
-SSOLegacy_request1 = requests.post('https://portal.yonsei.ac.kr/SSOLegacy.do',
-                                   cookies=SSOLegacy_request1_cookies, headers=SSOLegacy_request1_headers, data=SSOLegacy_request1_data)
+SSOLegacydo_prelogin_request = requests.post('https://portal.yonsei.ac.kr/SSOLegacy.do',
+                                             cookies=SSOLegacydo_prelogin_request_cookies, headers=SSOLegacy_prelogin_request_headers, data=SSOLegacy_prelogin_request_data)
 
-SSOLegacy_request_content1 = SSOLegacy_request1.content.decode()
-S1_start_index1 = SSOLegacy_request_content1.rfind("S1") + S1_pad
-S11 = SSOLegacy_request_content1[S1_start_index1:S1_start_index1 + S1_len]
+# region dissect SSOLegacydo_prelogin_request
+SSOLegacydo_prelogin_request_content = SSOLegacydo_prelogin_request.content.decode()
+index = SSOLegacydo_prelogin_request_content.rfind("S1") + S1_pad
+S1_prelogin = SSOLegacydo_prelogin_request_content[index:index + S1_len]
+# endregion
 
-
-PmSSOService1_request_headers = {
+# region PmSSOService_prelogin_request data
+PmSSOService_prelogin_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
@@ -117,47 +119,45 @@ PmSSOService1_request_headers = {
     'sec-ch-ua-platform': '"Windows"',
 }
 
-PmSSOService1_request_data = {
+PmSSOService_prelogin_request_data = {
     'app_id': 'nportalYonsei',
     'retUrl': 'https://portal.yonsei.ac.kr:443',
     'failUrl': 'https://portal.yonsei.ac.kr:443',
     'baseUrl': 'https://portal.yonsei.ac.kr:443',
-    'S1': S11,
+    'S1': S1_prelogin,
     'loginUrl': '',
     'ssoGubun': 'Redirect',
     'refererUrl': 'https://portal.yonsei.ac.kr/passni/spLogin.jsp',
     'a': 'aaaa',
     'b': 'bbbb',
 }
+# endregion
 
-PmSSOService1_request = requests.post('https://infra.yonsei.ac.kr/sso/PmSSOService',
-                                      headers=PmSSOService1_request_headers, data=PmSSOService1_request_data)
+PmSSOService_prelogin_request = requests.post('https://infra.yonsei.ac.kr/sso/PmSSOService',
+                                              headers=PmSSOService_prelogin_request_headers, data=PmSSOService_prelogin_request_data)
 
-s = PmSSOService1_request.headers["Set-Cookie"]
-# print(s)
-# print(PmSSOAuthService_request.content.decode())
-# print(PmSSOAuthService_request.headers)
-# find cookie vals
-__smVisitorID2_cookie_name = "__smVisitorID"
-__smVisitorID2 = ""
-index = s.rfind(__smVisitorID2_cookie_name) + \
-    len(__smVisitorID2_cookie_name) + 1  # this is a mess sorry
+# region dissect PmSSOService_prelogin_request
+s = PmSSOService_prelogin_request.headers["Set-Cookie"]
+
+__smVisitorID_auth = ""
+index = s.rfind(__smVisitorID_cookie_name) + \
+    len(__smVisitorID_cookie_name) + 1  # this is a mess sorry
 while (s[index] != ';'):
-    __smVisitorID2 += s[index]
+    __smVisitorID_auth += s[index]
     index += 1
 
-JSESSIONID2_cookie_name = "JSESSIONID"
-JSESSIONID2 = ""
-index = s.find(JSESSIONID2_cookie_name) + \
-    len(JSESSIONID2_cookie_name) + 1  # this is a mess sorry
+JSESSIONID_auth = ""
+index = s.find(JSESSIONID_cookie_name) + \
+    len(JSESSIONID_cookie_name) + 1  # this is a mess sorry
 while (s[index] != ';'):
-    JSESSIONID2 += s[index]
+    JSESSIONID_auth += s[index]
     index += 1
+# endregion
 
-
+# region logindo_request data
 logindo_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
 logindo_request_headers = {
@@ -176,17 +176,18 @@ logindo_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
+# endregion
 
 logindo_request = requests.get('https://portal.yonsei.ac.kr/portal/MainCtr/login.do',
                                cookies=logindo_request_cookies, headers=logindo_request_headers)
 
-
-spLogin1_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+# region spLoginjsp1 data
+spLoginjsp1_request_cookies = {
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
-spLogin1_request_headers = {
+spLoginjsp1_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Connection': 'keep-alive',
@@ -202,20 +203,18 @@ spLogin1_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
-
-spLogin1_request = requests.get('https://portal.yonsei.ac.kr/passni/spLogin.jsp',
-                                cookies=spLogin1_request_cookies, headers=spLogin1_request_headers)
-
-
 # endregion
 
+spLoginjsp1_request = requests.get('https://portal.yonsei.ac.kr/passni/spLogin.jsp',
+                                   cookies=spLoginjsp1_request_cookies, headers=spLoginjsp1_request_headers)
 
-SSOLegacy_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+# region SSOLegacy_request data
+SSOLegacydo_request_cookies = {
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
-SSOLegacy_request_headers = {
+SSOLegacydo_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
@@ -234,29 +233,28 @@ SSOLegacy_request_headers = {
     'sec-ch-ua-platform': '"Windows"',
 }
 
-SSOLegacy_request_data = {
+SSOLegacydo_request_data = {
     'retUrl': '',
     'failUrl': '',
     'ssoGubun': 'Redirect',
     'a': 'aaaa',
     'b': 'bbbb',
 }
+# endregion
 
-SSOLegacy_request = requests.post('https://portal.yonsei.ac.kr/SSOLegacy.do',
-                                  cookies=SSOLegacy_request_cookies, headers=SSOLegacy_request_headers, data=SSOLegacy_request_data)
+SSOLegacydo_request = requests.post('https://portal.yonsei.ac.kr/SSOLegacy.do',
+                                    cookies=SSOLegacydo_request_cookies, headers=SSOLegacydo_request_headers, data=SSOLegacydo_request_data)
 
-
-# region SSOLegacy_request dissect
-SSOLegacy_request_content = SSOLegacy_request.content.decode()
-S1_start_index = SSOLegacy_request_content.rfind("S1") + S1_pad
-S1 = SSOLegacy_request_content[S1_start_index:S1_start_index + S1_len]
+# region SSOLegacydo_request dissect
+SSOLegacydo_request_content = SSOLegacydo_request.content.decode()
+s_i = SSOLegacydo_request_content.rfind("S1") + S1_pad
+S1 = SSOLegacydo_request_content[s_i:s_i + S1_len]
 # endregion
 
 # region PmSSOService data
-
 PmSSOService_request_cookies = {
-    'JSESSIONID': JSESSIONID2,
-    '__smVisitorID': __smVisitorID2,
+    'JSESSIONID': JSESSIONID_auth,
+    '__smVisitorID': __smVisitorID_auth,
 }
 
 PmSSOService_request_headers = {
@@ -296,7 +294,6 @@ PmSSOService_request_data = {
 PmSSOService_request = requests.post('https://infra.yonsei.ac.kr/sso/PmSSOService',
                                      cookies=PmSSOService_request_cookies, headers=PmSSOService_request_headers, data=PmSSOService_request_data)
 
-# print(PmSSOService_request.content.decode())
 # region PmSSOService_request dissect
 PmSSOService_request_content = PmSSOService_request.content.decode()
 scan_i = PmSSOService_request_content.rfind(
@@ -330,7 +327,7 @@ while PmSSOService_request_content[ssoChallenge_start_index] != "'":
 
 # endregion
 
-
+#region authentication
 userid = "**replaced USERID using filter-repo**"
 userpw = "**replaced PW using filter-repo**"
 
@@ -343,11 +340,12 @@ publicKeyHex = (RSAPublicKey1, RSAPublicKey2)
 publicKey = rsa.PublicKey(int(publicKeyHex[0], 16), int(publicKeyHex[1], 16))
 
 encMsg = rsa.encrypt(message.encode(), publicKey)
+#endregion
 
-
+#region PmSSOAuthService_request data
 PmSSOAuthService_request_cookies = {
-    'JSESSIONID': JSESSIONID2,
-    '__smVisitorID': __smVisitorID2,
+    'JSESSIONID': JSESSIONID_auth,
+    '__smVisitorID': __smVisitorID_auth,
 }
 
 PmSSOAuthService_request_headers = {
@@ -388,15 +386,13 @@ PmSSOAuthService_request_data = [
     ('loginPasswd', ''),
     ('loginId', ''),
 ]
+#endregion
 
 PmSSOAuthService_request = requests.post(
     "https://infra.yonsei.ac.kr/sso/PmSSOAuthService", cookies=PmSSOAuthService_request_cookies, headers=PmSSOAuthService_request_headers, data=PmSSOAuthService_request_data)
 
+#region PmSSOAuthService_request dissect
 PmSSOAuthService_request_content = PmSSOAuthService_request.content.decode()
-# print(PmSSOAuthService_request_content)
-
-print(scan_i)
-print(PmSSOAuthService_request_content)
 
 scan_i = PmSSOAuthService_request_content.find(
     '"E3"       value=') + len('"E3"       value=') + 1
@@ -425,15 +421,17 @@ CLTID = ""
 while PmSSOAuthService_request_content[scan_i] != '"':
     CLTID += PmSSOAuthService_request_content[scan_i]
     scan_i += 1
+if PRINT_DISSECT_VALS:
+    print(E3)
+    print(E4)
+    print(S2)
+    print(CLTID)
+#endregion
 
-print(E3)
-print(E4)
-print(S2)
-print(CLTID)
-
+#region SSOLegacydopnamespLoginData_request data
 SSOLegacydopnamespLoginData_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
 SSOLegacydopnamespLoginData_request_headers = {
@@ -474,18 +472,18 @@ SSOLegacydopnamespLoginData_request_data = {
     'a': 'aaaa',
     'b': 'bbbb',
 }
+#endregion
 
 SSOLegacydopnamespLoginData_request = requests.post('https://portal.yonsei.ac.kr/SSOLegacy.do', params=SSOLegacydopnamespLoginData_request_params,
                                                     cookies=SSOLegacydopnamespLoginData_request_cookies, headers=SSOLegacydopnamespLoginData_request_headers, data=SSOLegacydopnamespLoginData_request_data)
-print(SSOLegacydopnamespLoginData_request.headers)
 
-
-spLoginProcessjsp1_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+#region spLoginProcessjsp_postlogin1_request data
+spLoginProcessjsp_postlogin1_request_cookies = {
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
-spLoginProcessjsp1_request_headers = {
+spLoginProcessjsp_postlogin1_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
@@ -495,16 +493,18 @@ spLoginProcessjsp1_request_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
 }
 
-spLoginProcessjsp1_request = requests.get('http://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
-                                          cookies=spLoginProcessjsp1_request_cookies, headers=spLoginProcessjsp1_request_headers, verify=False)
+#endregion
 
+spLoginProcessjsp_postlogin1_request = requests.get('http://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
+                                          cookies=spLoginProcessjsp_postlogin1_request_cookies, headers=spLoginProcessjsp_postlogin1_request_headers, verify=False)
 
-spLoginProcessjsp2_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+#region spLoginProcessjsp_postlogin2_request data
+spLoginProcessjsp_postlogin2_request_cookies = {
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
-spLoginProcessjsp2_request_headers = {
+spLoginProcessjsp_postlogin2_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
@@ -519,14 +519,15 @@ spLoginProcessjsp2_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
+#endregion
 
-spLoginProcessjsp2_request = requests.get('https://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
-                                          cookies=spLoginProcessjsp2_request_cookies, headers=spLoginProcessjsp2_request_headers)
+spLoginProcessjsp_postlogin2_request = requests.get('https://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
+                                          cookies=spLoginProcessjsp_postlogin2_request_cookies, headers=spLoginProcessjsp_postlogin2_request_headers)
 
-
+#region j_login_ssodo_request data
 j_login_ssodo_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
 j_login_ssodo_request_headers = {
@@ -544,14 +545,15 @@ j_login_ssodo_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
+#endregion
 
 j_login_ssodo_request = requests.get('https://portal.yonsei.ac.kr/com/lgin/SsoCtr/j_login_sso.do',
                                      cookies=j_login_ssodo_request_cookies, headers=j_login_ssodo_request_headers)
 
-
+#region indexdo_request data
 indexdo_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
 indexdo_request_headers = {
@@ -569,14 +571,15 @@ indexdo_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
+#endregion
 
 indexdo_request = requests.get('https://portal.yonsei.ac.kr/portal/MainCtr/index.do',
                                cookies=indexdo_request_cookies, headers=indexdo_request_headers)
 
-
+#region mainjsp_request data
 mainjsp_request_cookies = {
-    '__smVisitorID': __smVisitorID1,
-    'JSESSIONID': JSESSIONID1,
+    '__smVisitorID': __smVisitorID_main,
+    'JSESSIONID': JSESSIONID_main,
 }
 
 mainjsp_request_headers = {
@@ -594,7 +597,9 @@ mainjsp_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
+#endregion
 
 mainjsp_request = requests.get('https://portal.yonsei.ac.kr/ui/thirdparty/portal/main.jsp',
                                cookies=mainjsp_request_cookies, headers=mainjsp_request_headers)
+
 print(mainjsp_request.headers["Set-Cookie"])
