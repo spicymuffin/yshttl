@@ -2,9 +2,9 @@ import json
 import rsa
 import base64
 
-userid = "**replaced ALIAS using filter-repo**"
-userpw = "password"
-ssoChallenge = '7CFE0AA1B13EC75201B1B77E5943CB237F2BE8D9'
+userid = "asd"
+userpw = "asd"
+ssoChallenge = 'E6E30280BDAD885A21E49809D77B728406C1D07E'
 jsonObj = {'userid': userid, 'userpw': userpw, 'ssoChallenge': ssoChallenge}
 
 y = json.dumps(jsonObj, separators=(',', ':'))
@@ -15,4 +15,3 @@ publicKey = rsa.PublicKey(int(publicKeyHex[0], 16), int(publicKeyHex[1], 16))
 
 encMsg = rsa.encrypt(message.encode(), publicKey)
 print(encMsg.hex())
-
