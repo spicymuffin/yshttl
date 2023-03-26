@@ -14,12 +14,16 @@ S1_len = len('34175A69027670C2C2B2ED852C9E1E2BD357330DE5A3D487CC24BC7324F8446B1F
 
 JSESSIONID_cookie_name = "JSESSIONID"
 __smVisitorID_cookie_name = "__smVisitorID"
+cugubun_cookie_name = "cugubun"
+UbiResult_cookie_name = "UbiResult"
+WMONID_cookie_name = "WMONID"
 
 ssoChallenge_pad = len("var ssoChallenge= '")
 
 PRINT_DISSECT_VALS = False
 # endregion
 
+# region pre-login
 # region spLoginjsp_request data
 spLoginjsp_request_data = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -326,8 +330,9 @@ while PmSSOService_request_content[ssoChallenge_start_index] != "'":
     ssoChallenge_start_index += 1
 
 # endregion
+# endregion
 
-#region authentication
+# region authentication
 userid = "**replaced USERID using filter-repo**"
 userpw = "**replaced PW using filter-repo**"
 
@@ -340,9 +345,10 @@ publicKeyHex = (RSAPublicKey1, RSAPublicKey2)
 publicKey = rsa.PublicKey(int(publicKeyHex[0], 16), int(publicKeyHex[1], 16))
 
 encMsg = rsa.encrypt(message.encode(), publicKey)
-#endregion
+# endregion
 
-#region PmSSOAuthService_request data
+# region post-login
+# region PmSSOAuthService_request data
 PmSSOAuthService_request_cookies = {
     'JSESSIONID': JSESSIONID_auth,
     '__smVisitorID': __smVisitorID_auth,
@@ -386,12 +392,12 @@ PmSSOAuthService_request_data = [
     ('loginPasswd', ''),
     ('loginId', ''),
 ]
-#endregion
+# endregion
 
 PmSSOAuthService_request = requests.post(
     "https://infra.yonsei.ac.kr/sso/PmSSOAuthService", cookies=PmSSOAuthService_request_cookies, headers=PmSSOAuthService_request_headers, data=PmSSOAuthService_request_data)
 
-#region PmSSOAuthService_request dissect
+# region PmSSOAuthService_request dissect
 PmSSOAuthService_request_content = PmSSOAuthService_request.content.decode()
 
 scan_i = PmSSOAuthService_request_content.find(
@@ -426,9 +432,9 @@ if PRINT_DISSECT_VALS:
     print(E4)
     print(S2)
     print(CLTID)
-#endregion
+# endregion
 
-#region SSOLegacydopnamespLoginData_request data
+# region SSOLegacydopnamespLoginData_request data
 SSOLegacydopnamespLoginData_request_cookies = {
     '__smVisitorID': __smVisitorID_main,
     'JSESSIONID': JSESSIONID_main,
@@ -472,12 +478,12 @@ SSOLegacydopnamespLoginData_request_data = {
     'a': 'aaaa',
     'b': 'bbbb',
 }
-#endregion
+# endregion
 
 SSOLegacydopnamespLoginData_request = requests.post('https://portal.yonsei.ac.kr/SSOLegacy.do', params=SSOLegacydopnamespLoginData_request_params,
                                                     cookies=SSOLegacydopnamespLoginData_request_cookies, headers=SSOLegacydopnamespLoginData_request_headers, data=SSOLegacydopnamespLoginData_request_data)
 
-#region spLoginProcessjsp_postlogin1_request data
+# region spLoginProcessjsp_postlogin1_request data
 spLoginProcessjsp_postlogin1_request_cookies = {
     '__smVisitorID': __smVisitorID_main,
     'JSESSIONID': JSESSIONID_main,
@@ -493,12 +499,12 @@ spLoginProcessjsp_postlogin1_request_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
 }
 
-#endregion
+# endregion
 
 spLoginProcessjsp_postlogin1_request = requests.get('http://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
-                                          cookies=spLoginProcessjsp_postlogin1_request_cookies, headers=spLoginProcessjsp_postlogin1_request_headers, verify=False)
+                                                    cookies=spLoginProcessjsp_postlogin1_request_cookies, headers=spLoginProcessjsp_postlogin1_request_headers, verify=False)
 
-#region spLoginProcessjsp_postlogin2_request data
+# region spLoginProcessjsp_postlogin2_request data
 spLoginProcessjsp_postlogin2_request_cookies = {
     '__smVisitorID': __smVisitorID_main,
     'JSESSIONID': JSESSIONID_main,
@@ -519,12 +525,12 @@ spLoginProcessjsp_postlogin2_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
-#endregion
+# endregion
 
 spLoginProcessjsp_postlogin2_request = requests.get('https://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
-                                          cookies=spLoginProcessjsp_postlogin2_request_cookies, headers=spLoginProcessjsp_postlogin2_request_headers)
+                                                    cookies=spLoginProcessjsp_postlogin2_request_cookies, headers=spLoginProcessjsp_postlogin2_request_headers)
 
-#region j_login_ssodo_request data
+# region j_login_ssodo_request data
 j_login_ssodo_request_cookies = {
     '__smVisitorID': __smVisitorID_main,
     'JSESSIONID': JSESSIONID_main,
@@ -545,12 +551,12 @@ j_login_ssodo_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
-#endregion
+# endregion
 
 j_login_ssodo_request = requests.get('https://portal.yonsei.ac.kr/com/lgin/SsoCtr/j_login_sso.do',
                                      cookies=j_login_ssodo_request_cookies, headers=j_login_ssodo_request_headers)
 
-#region indexdo_request data
+# region indexdo_request data
 indexdo_request_cookies = {
     '__smVisitorID': __smVisitorID_main,
     'JSESSIONID': JSESSIONID_main,
@@ -571,12 +577,12 @@ indexdo_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
-#endregion
+# endregion
 
 indexdo_request = requests.get('https://portal.yonsei.ac.kr/portal/MainCtr/index.do',
                                cookies=indexdo_request_cookies, headers=indexdo_request_headers)
 
-#region mainjsp_request data
+# region mainjsp_request data
 mainjsp_request_cookies = {
     '__smVisitorID': __smVisitorID_main,
     'JSESSIONID': JSESSIONID_main,
@@ -597,9 +603,118 @@ mainjsp_request_headers = {
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
 }
-#endregion
+# endregion
 
 mainjsp_request = requests.get('https://portal.yonsei.ac.kr/ui/thirdparty/portal/main.jsp',
                                cookies=mainjsp_request_cookies, headers=mainjsp_request_headers)
+# endregion
 
 print(mainjsp_request.headers["Set-Cookie"])
+
+# region mainjsp_request dissect
+s = mainjsp_request.headers["Set-Cookie"]
+scan_i = s.find(cugubun_cookie_name)+len(cugubun_cookie_name)+1
+cugubun = ""
+while s[scan_i] != ";":
+    cugubun += s[scan_i]
+    scan_i += 1
+
+scan_i = s.find(UbiResult_cookie_name)+len(UbiResult_cookie_name)+1
+UbiResult = ""
+while s[scan_i] != ";":
+    UbiResult += s[scan_i]
+    scan_i += 1
+
+if PRINT_DISSECT_VALS:
+    print(cugubun)
+    print(UbiResult)
+# endregion
+
+print(__smVisitorID_main)
+print(JSESSIONID_main)
+print(cugubun)
+print(UbiResult)
+
+# region underwood1_WMONID_request data
+underwood1_WMONID_request_cookies = {
+    'JSESSIONID': JSESSIONID_main,
+    'cugubun': cugubun,
+    'UbiResult': UbiResult,
+}
+
+underwood1_WMONID_request_headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
+    'Cache-Control': 'max-age=0',
+    'Connection': 'keep-alive',
+    # 'Cookie': 'JSESSIONID=cKQzlfUkLV9QYqLifyjfQmqduTJfg1Y8Vaat5TT0UqjItOmIxOLsDD71lbpjAkAy.amV1c19kb21haW4vaGFrc2ExXzE=; cugubun=FWoNcShBVqMoCNAVKOMoCNBWQIIi; UbiResult=DAh6COsSmpnYfeRSQ0OkbQ==',
+    'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/j_login_sso.do?locale=ko',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+    'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+}
+
+underwood1_WMONID_request_params = {
+    'link': 'shuttle',
+}
+# endregion
+
+underwood1_WMONID_request = requests.get(
+    'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do',
+    params=underwood1_WMONID_request_params,
+    cookies=underwood1_WMONID_request_cookies,
+    headers=underwood1_WMONID_request_headers,
+)
+s = underwood1_WMONID_request.headers["Set-Cookie"]
+scan_i = s.find(WMONID_cookie_name) + len(WMONID_cookie_name) + 1
+WMONID = ""
+
+while s[scan_i] != ";":
+    WMONID += s[scan_i]
+    scan_i+= 1
+
+print(underwood1_WMONID_request.headers)
+print(WMONID)
+
+# region test
+
+# cookies = {
+#     'cugubun': cugubun,
+#     'UbiResult': UbiResult,
+#     'WMONID': 'VznSh_9GCE4',
+#     'JSESSIONID': JSESSIONID_main,
+# }
+
+# headers = {
+#     'Accept': '*/*',
+#     'Accept-Language': 'en-US,en;q=0.9',
+#     'Connection': 'keep-alive',
+#     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+#     # 'Cookie': 'cugubun=JYrRfQiAbtocKpIhetocKpJikomE; UbiResult=MRxhvwJB/cG8+H9KsVmYpg==; WMONID=VznSh_9GCE4; JSESSIONID=L74lx2VzQhcHhXnKtvrEdGrveQ6TMOmn4WYwznrfXyU8TKKEx9lmZ6QSa3aeVacW.amV1c19kb21haW4vaGFrc2ExXzE=',
+#     'Origin': 'https://underwood1.yonsei.ac.kr',
+#     'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
+#     'Sec-Fetch-Dest': 'empty',
+#     'Sec-Fetch-Mode': 'cors',
+#     'Sec-Fetch-Site': 'same-origin',
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+#     'X-Requested-With': 'XMLHttpRequest',
+#     'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
+#     'sec-ch-ua-mobile': '?0',
+#     'sec-ch-ua-platform': '"Windows"',
+# }
+
+# data = '_menuId=MTA3NDkwNzI0MDIyNjk1MTQwMDA%3D&_menuNm=&_pgmId=MzI5MzAyNzI4NzE%3D&%40d1%23areaDivCd=I&%40d1%23stdrDt=20230327&%40d1%23resvePosblDt=2&%40d1%23seatDivCd=1&%40d1%23areaDivCd2=&%40d1%23stdrDt2=20230325&%40d1%23userDivCd=12&%40d%23=%40d1%23&%40d1%23=dmCond&%40d1%23tp=dm&'
+
+# response = requests.post(
+#     'https://underwood1.yonsei.ac.kr/sch/shtl/ShtlrmCtr/findShtlbusResveList.do',
+#     cookies=cookies,
+#     headers=headers,
+#     data=data,
+# )
+# endregion
