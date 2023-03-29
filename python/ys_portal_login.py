@@ -635,6 +635,10 @@ print(JSESSIONID_main)
 print(cugubun)
 print(UbiResult)
 
+# region underwood authentication
+
+# endregion
+
 # region underwood1_WMONID_request data
 underwood1_WMONID_request_cookies = {
     'JSESSIONID': JSESSIONID_main,
@@ -679,8 +683,8 @@ while s[scan_i] != ";":
     WMONID += s[scan_i]
     scan_i+= 1
 
-print(underwood1_WMONID_request.headers)
-print(WMONID)
+# print(underwood1_WMONID_request.headers)
+# print(WMONID)
 
 # region test
 

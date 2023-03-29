@@ -3,19 +3,32 @@ import os
 import threading
 import time
 import datetime
+from auth_master import get_auth_cookies
 
-WORKING_DIR = os.getcwd()
+
+CURR_PATH = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE_NAME = "config.txt"
-CONFIG_FILE_PATH = WORKING_DIR + '\\' + CONFIG_FILE_NAME
+CONFIG_FILE_PATH = CURR_PATH + '\\' + CONFIG_FILE_NAME
+COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
+COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
 LOCAL_LIST_REFRESH_TIME = 20  # in seconds
+USERID = "**replaced USERID using filter-repo**"
+USERPW = "**replaced PW using filter-repo**"
 
+WMONID = ""
+JSESSIONID = ""
 
 BOOK_QUEUE = []
 
-# create empty config file if it doesnt exist
-if not os.path.exists(CONFIG_FILE_PATH):
-    with open(CONFIG_FILE_PATH, 'w') as file:
-        pass
+
+with open(CONFIG_FILE_PATH, 'w') as file:
+    pass
+
+if os.path.exists(COOKIE_JAR_FILE_PATH):
+    with open(CONFIG_FILE_PATH, 'r') as file:
+        WMONID = file.readline()
+        JSESSIONID = file.readline()
+
 
 # we need a system to set a schedule:
 # timetable in config file:
@@ -54,6 +67,15 @@ def cinput(indent=False):
 # arg format: xx mmdd h:m
 # ex:
 # book si 140623 24:00
+
+
+def getcookies_handler():
+    cookies = get_auth_cookies(USERID, USERPW)
+    with open(COOKIE_JAR_FILE_PATH, 'w') as file:
+        file.write(cookies[0] + '\n' + cookies[1])
+    WMONID = cookies[0]
+    JSESSIONID = cookies[1]
+    cprint(f"Cookies updated and stored: {cookies}")
 
 
 def book_handler(args):
@@ -137,6 +159,8 @@ def console_handler():
             book_handler(inp_parsed)
         elif cmd == "quit":
             quit_handler()
+        elif cmd == "getcookies":
+            getcookies_handler()
         else:
             cprint(f"{cmd} is not recognized as a command")
 
