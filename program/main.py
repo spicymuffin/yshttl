@@ -11,7 +11,7 @@ CONFIG_FILE_NAME = "config.txt"
 CONFIG_FILE_PATH = CURR_PATH + '\\' + CONFIG_FILE_NAME
 COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
 COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
-LOCAL_LIST_REFRESH_TIME = 20  # in seconds
+LOCAL_LIST_REFRESH_TIME = 60*5  # in seconds
 USERID = "**replaced USERID using filter-repo**"
 USERPW = "**replaced PW using filter-repo**"
 
@@ -46,11 +46,23 @@ SUN
 
 
 class Route:
-    def __init__(self, _origin, _departure_datetime, _seats_available=-1, _handle=-1):
+    def __init__(self, _origin, _departure_datetime, _seats_available=-1, _handle=-1) -> None:
         self.origin = _origin
         self.departure_datetime = _departure_datetime
         self.seats_available = _seats_available
         self.handle = _handle
+
+    def import_dictionary(self, _dct):
+        self.dct = _dct
+        self.origin = _dct["areaDivCd"]
+        year = int(_dct["stdrDt"][0:4])
+        month = int(_dct["stdrDt"][5:6])
+        day = int(_dct["strDt"][7:8])
+        hour = int(_dct["beginTm"][0:2])
+        minute = int(_dct["beginTm"][3:4])
+        self.departure_datetime = datetime.datetime(
+            year, month, day, hour, minute)
+        self.seats_available = int(_dct["remndSeat"])
 
 
 def cprint(msg):
@@ -63,10 +75,10 @@ def cinput(indent=False):
     else:
         return input("    <<< ")
 
-# route origin (si/so) date max allowed dep time
+# route origin (I/S) date max allowed dep time
 # arg format: xx mmdd h:m
 # ex:
-# book si 140623 24:00
+# book I 140623 24:00
 
 
 def getcookies_handler():
@@ -99,7 +111,7 @@ def book_error_handler(args):
         origin = "xx"
 
         # parse args sinchon songdo
-        if args[1] == "so" or "si":
+        if args[1] == "I" or "S":
             origin = args[1]
         else:
             return "DestinationArgFormatError"
@@ -150,6 +162,17 @@ def quit_handler():
         quit(0)
 
 
+def check_login_state():
+    # check whether cookies are still valid
+    return True
+
+
+def update_internal_shttl_list():
+    if not check_login_state():
+        return -1
+    shttl_list = shttl_interface.get_shttl_list()
+
+
 def console_handler():
     while True:
         inp = cinput()
@@ -168,7 +191,7 @@ def console_handler():
 def local_update():
     while True:
         time.sleep(LOCAL_LIST_REFRESH_TIME)
-        # pull data from website, put into a list of Route objects
+        update_internal_shttl_list()
 
 
 console_handler()

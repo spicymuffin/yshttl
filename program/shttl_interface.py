@@ -267,6 +267,7 @@ def gen_book_shttl_data_string(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, 
     db.ds_append(d1_endTm_name, d1_endTm)
     db.ds_append(d1_tm_name, d1_tm)
     db.ds_append(d1_seatDivCd_name, d1_seatDivCd)
+    db.ds_append(d1_userDivCd_name, d1_userDivCd)
     db.ds_append(d1_persNo_name, d1_persNo)
     db.ds_append(d1_thrstNm_name, d1_thrstNm)
     db.ds_append(d1_remrk_name, d1_remrk)
@@ -299,7 +300,7 @@ s = gen_get_shttls_list_data_string(
 print(s)
 
 
-def get_shttl_list(_WMONID, _JSESSIONID, _data_string):
+def request_shttl_list(_WMONID, _JSESSIONID, _data_string):
     findShtlbusResveList_do_cookies = {
         'WMONID': _WMONID,
         'JSESSIONID': _JSESSIONID,
@@ -333,7 +334,6 @@ def get_shttl_list(_WMONID, _JSESSIONID, _data_string):
     )
 
     return findShtlbusResveList_do_response.content.decode()
-
 
 
 def parse_shttl_list(sl):
@@ -388,11 +388,11 @@ def parse_shttl_list(sl):
             key = ""
     return bus_l
 
-r = get_shttl_list(WMONID, JSESSIONID, s)
-if "로그인 정보" in r:
-    raise ConnectionError("failed to get shttl list: credentials expired")
-
-d = parse_shttl_list(r)
+def get_shttl_list():
+    r = request_shttl_list(WMONID, JSESSIONID, s)
+    if "로그인 정보" in r:
+        raise ConnectionError("failed to get shttl list: credentials expired")
+    d = parse_shttl_list(r)
 
 
 for b in d:
