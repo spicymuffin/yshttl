@@ -3,8 +3,8 @@ import os
 import threading
 import time
 import datetime
-from auth_master import get_auth_cookies
-
+import auth_master
+import shttl_interface
 
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE_NAME = "config.txt"
@@ -70,7 +70,7 @@ def cinput(indent=False):
 
 
 def getcookies_handler():
-    cookies = get_auth_cookies(USERID, USERPW)
+    cookies = auth_master.get_auth_cookies(USERID, USERPW)
     with open(COOKIE_JAR_FILE_PATH, 'w') as file:
         file.write(cookies[0] + '\n' + cookies[1])
     WMONID = cookies[0]
