@@ -120,23 +120,90 @@ def gen_get_shttls_list_data_string(_areaDivCd, _stdrDt, _resvePosblDt, _seatDiv
 
     return db.ds
 
-def gen_book_shttl_data_string(_areaDivCd, _busCd, _busNm, _seatNo, _stdrDt, _beginTm, _endTm, _tm, _seatDivCd, _userDivCd, _persNo):
+def gen_book_shttl_data_string(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, _d1_beginTm, _d1_endTm, _d1_tm, _d1_thrstNm, _d1_remrk, _d1_remndSeat, _d1_resveWaitPcnt, _d1_resveYn, _d1_resveWaitYn, _d1_resveResnDivCd, _d1_dailResvePosblYn, _d1_areaDivCd__origin, _d1_busCd__origin, _d1_stdrDt__origin, _d1_beginTm__origin, _d2_seatDivCd, _d2_userDivCd, _d2_empty, _d2_tp):
+    db = data_buider()
+
     # vars
-    findSavedRow = "areaDivCd, busCd, seatNo, stdrDt, beginTm"
-    menuId = "MTA3NDkwNzI0MDIyNjk1MTQwMDA="
-    menuNm = ""
-    pgmId = "MzI5MzAyNzI4NzE="
-    areaDivCd = _areaDivCd
-    busCd = _busCd
-    busNm = _busNm
-    seatNo = _seatNo
-    stdrDt = _stdrDt
-    beginTm = _beginTm
-    endTm = _endTm
-    tm = _tm
-    seatDivCd = _seatDivCd
-    userDivCd = _userDivCd
-    persNo = _persNo
+    d1_findSavedRow = "areaDivCd, busCd, seatNo, stdrDt, beginTm"
+    d1_menuId = "MTA3NDkwNzI0MDIyNjk1MTQwMDA="
+    d1_menuNm = ""
+    d1_pgmId = "MzI5MzAyNzI4NzE="
+    d1_areaDivCd = _d1_areaDivCd
+    d1_busCd = _d1_busCd
+    d1_busNm = _d1_busNm
+    d1_seatNo = ""
+    d1_stdrDt = _d1_stdrDt
+    d1_beginTm = _d1_beginTm
+    d1_endTm = _d1_endTm
+    d1_tm = _d1_tm
+    d1_seatDivCd = ""
+    d1_userDivCd = ""
+    d1_persNo = ""
+    d1_thrstNm = _d1_thrstNm
+    d1_remrk = _d1_remrk
+    d1_remndSeat = _d1_remndSeat
+    d1_resveWaitPcnt = _d1_resveWaitPcnt
+    d1_resveYn = _d1_resveYn
+    d1_resveWaitYn = _d1_resveWaitYn
+    d1_resveResnDivCd = _d1_resveResnDivCd
+    d1_dailResvePosblYn = _d1_dailResvePosblYn
+    d1_areaDivCd__origin = _d1_areaDivCd__origin
+    d1_busCd__origin = _d1_busCd__origin
+    d1_seatNo__origin = ""
+    d1_stdrDt__origin = _d1_stdrDt__origin
+    d1_beginTm__origin = _d1_beginTm__origin
+    d1_sts = "u"
+    d1_d_hashtag = "@d1#"
+    d1_empty = "dsShtl110"
+    d1_tp = "ds"
+    d2_gbn = "P"
+    d2_seatDivCd = _d2_seatDivCd
+    d2_userDivCd = _d2_userDivCd
+    d2_d_hashtag = "@d2#"
+    d2_empty = _d2_empty # is @d1# from find query
+    d2_tp = _d2_tp # is @d1#tp from find query
+
+    #names
+    d1_findSavedRow_name = "_findSavedRow"
+    d1_menuId_name = "_menuId"
+    d1_menuNm_name = "_menuNm"
+    d1_pgmId_name = "_pgmId"
+    d1_areaDivCd_name = "@d1#areaDivCd"
+    d1_busCd_name = "@d1#busCd"
+    d1_busNm_name = "@d1#busNm"
+    d1_seatNo_name = "@d1#seatNo"
+    d1_stdrDt_name = "@d1#stdrDt"
+    d1_beginTm_name = "@d1#beginTm"
+    d1_endTm_name = "@d1#endTm"
+    d1_tm_name = "@d1#tm"
+    d1_seatDivCd_name = "@d1#seatDivCd"
+    d1_userDivCd_name = "@d1#userDivCd"
+    d1_persNo_name = "@d1#persNo"
+    d1_thrstNm_name = "@d1#thrstNm"
+    d1_remrk_name = "@d1#remrk"
+    d1_remndSeat_name = "@d1#remndSeat"
+    d1_resveWaitPcnt_name = "@d1#resveWaitPcnt"
+    d1_resveYn_name = "@d1#resveYn"
+    d1_resveWaitYn_name = "@d1#resveWaitYn"
+    d1_resveResnDivCd_name = "@d1#resveResnDivCd"
+    d1_dailResvePosblYn_name = "@d1#dailResvePosblYn"
+    d1_areaDivCd__origin_name = "@d1#areaDivCd__origin"
+    d1_busCd__origin_name = "@d1#busCd__origin"
+    d1_seatNo__origin_name = "@d1#seatNo__origin"
+    d1_stdrDt__origin_name = "@d1#stdrDt__origin"
+    d1_beginTm__origin_name = "@d1#beginTm__origin"
+    d1_sts_name = "@d1#sts"
+    d1_d_hashtag_name = "@d#"
+    d1_empty_name = "@d1#"
+    d1_tp_name = "@d1#tp"
+    d2_gbn_name = "@d2#gbn"
+    d2_seatDivCd_name = "@d2#seatDivCd"
+    d2_userDivCd_name = "@d2#userDivCd"
+    d2_d_hashtag_name = "@d#"
+    d2_empty_name = "@d2#"
+    d2_tp_name = "@d2#tp"
+
+
     # region samples
     # sample data pack
     '''
@@ -185,6 +252,48 @@ def gen_book_shttl_data_string(_areaDivCd, _busCd, _busNm, _seatNo, _stdrDt, _be
     '''
     # endregion
 
+    # build data_string
+
+    db.ds_append(d1_findSavedRow_name, d1_findSavedRow)
+    db.ds_append(d1_menuId_name, d1_menuId)
+    db.ds_append(d1_menuNm_name, d1_menuNm)
+    db.ds_append(d1_pgmId_name, d1_pgmId)
+    db.ds_append(d1_areaDivCd_name, d1_areaDivCd)
+    db.ds_append(d1_busCd_name, d1_busCd)
+    db.ds_append(d1_busNm_name, d1_busNm)
+    db.ds_append(d1_seatNo_name, d1_seatNo)
+    db.ds_append(d1_stdrDt_name, d1_stdrDt)
+    db.ds_append(d1_beginTm_name, d1_beginTm)
+    db.ds_append(d1_endTm_name, d1_endTm)
+    db.ds_append(d1_tm_name, d1_tm)
+    db.ds_append(d1_seatDivCd_name, d1_seatDivCd)
+    db.ds_append(d1_persNo_name, d1_persNo)
+    db.ds_append(d1_thrstNm_name, d1_thrstNm)
+    db.ds_append(d1_remrk_name, d1_remrk)
+    db.ds_append(d1_remndSeat_name, d1_remndSeat)
+    db.ds_append(d1_resveWaitPcnt_name, d1_resveWaitPcnt)
+    db.ds_append(d1_resveYn_name, d1_resveYn)
+    db.ds_append(d1_resveWaitYn_name, d1_resveWaitYn)
+    db.ds_append(d1_resveResnDivCd_name, d1_resveResnDivCd)
+    db.ds_append(d1_dailResvePosblYn_name, d1_dailResvePosblYn)
+    db.ds_append(d1_areaDivCd__origin_name, d1_areaDivCd__origin)
+    db.ds_append(d1_busCd__origin_name, d1_busCd__origin)
+    db.ds_append(d1_seatNo__origin_name, d1_seatNo__origin)
+    db.ds_append(d1_stdrDt__origin_name, d1_stdrDt__origin)
+    db.ds_append(d1_beginTm__origin_name, d1_beginTm__origin)
+    db.ds_append(d1_sts_name, d1_sts)
+    db.ds_append(d1_d_hashtag_name, d1_d_hashtag)
+    db.ds_append(d1_empty_name, d1_empty)
+    db.ds_append(d1_tp_name, d1_tp)
+    db.ds_append(d2_gbn_name, d2_gbn)
+    db.ds_append(d2_seatDivCd_name, d2_seatDivCd)
+    db.ds_append(d2_userDivCd_name, d2_userDivCd)
+    db.ds_append(d2_d_hashtag_name, d2_d_hashtag)
+    db.ds_append(d2_empty_name, d2_empty)
+    db.ds_append(d2_tp_name, d2_tp)
+
+    return db.ds
+
 s = gen_get_shttls_list_data_string(
     "I", "20230331", "1", "1", "", "20230330", "12", "@d1#", "dmCond", "dm")
 print(s)
@@ -226,12 +335,6 @@ def get_shttl_list(_WMONID, _JSESSIONID, _data_string):
     return findShtlbusResveList_do_response.content.decode()
 
 
-#r = get_shttl_list(WMONID, JSESSIONID, s)
-
-# with open("sample_reserve_list_unparsed.txt", "r") as file:
-#     r = file.readline()[:-1]
-
-r = '''{"dsShtl110":[{"resveWaitPcnt":5,"remndSeat":18,"busNm":"4호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"0800","dailResvePosblYn":"1","tm":"07:00 ~ 08:00","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I4","beginTm":"0700"},{"resveWaitPcnt":5,"remndSeat":19,"busNm":"5호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"0820","dailResvePosblYn":"1","tm":"07:20 ~ 08:20","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I5","beginTm":"0720"},{"resveWaitPcnt":5,"remndSeat":9,"busNm":"6호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"0840","dailResvePosblYn":"1","tm":"07:40 ~ 08:40","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I6","beginTm":"0740"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"1호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"0930","dailResvePosblYn":"1","tm":"08:30 ~ 09:30","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I1","beginTm":"0830"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"2호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1030","dailResvePosblYn":"1","tm":"09:30 ~ 10:30","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I2","beginTm":"0930"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"3호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1130","dailResvePosblYn":"1","tm":"10:30 ~ 11:30","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I3","beginTm":"1030"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"4호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1230","dailResvePosblYn":"1","tm":"11:30 ~ 12:30","thrstNm":"경인고속도로","areaDivCd":"I","busCd":"I4","beginTm":"1130"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"5호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1330","dailResvePosblYn":"1","tm":"12:30 ~ 13:30","thrstNm":"경인고속도로","areaDivCd":"I","busCd":"I5","beginTm":"1230"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"6호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1530","dailResvePosblYn":"1","tm":"14:30 ~ 15:30","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I6","beginTm":"1430"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"1호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1610","dailResvePosblYn":"1","tm":"15:10 ~ 16:10","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I1","beginTm":"1510"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"2호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1730","dailResvePosblYn":"1","tm":"16:30 ~ 17:30","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I2","beginTm":"1630"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"3호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1810","dailResvePosblYn":"1","tm":"17:10 ~ 18:10","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I3","beginTm":"1710"},{"resveWaitPcnt":0,"remndSeat":0,"busNm":"5호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1910","dailResvePosblYn":"1","tm":"18:10 ~ 19:10","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I5","beginTm":"1810"},{"resveWaitPcnt":4,"remndSeat":0,"busNm":"6호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"1930","dailResvePosblYn":"1","tm":"18:30 ~ 19:30","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I6","beginTm":"1830"},{"resveWaitPcnt":5,"remndSeat":36,"busNm":"1호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"2000","dailResvePosblYn":"1","tm":"19:00 ~ 20:00","thrstNm":"영종대교, 인천대교","areaDivCd":"I","busCd":"I1","beginTm":"1900"},{"resveWaitPcnt":5,"remndSeat":40,"busNm":"2호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"2040","dailResvePosblYn":"1","tm":"19:40 ~ 20:40","thrstNm":"경인고속도로","areaDivCd":"I","busCd":"I2","beginTm":"1940"},{"resveWaitPcnt":5,"remndSeat":40,"busNm":"3호차","remrk":null,"resveYn":0,"resveResnDivCd":null,"stdrDt":"20230331","resveWaitYn":0,"endTm":"2100","dailResvePosblYn":"1","tm":"20:00 ~ 21:00","thrstNm":"경인고속도로","areaDivCd":"I","busCd":"I3","beginTm":"2000"}]}'''
 
 def parse_shttl_list(sl):
     index = 0
@@ -285,8 +388,14 @@ def parse_shttl_list(sl):
             key = ""
     return bus_l
 
+r = get_shttl_list(WMONID, JSESSIONID, s)
+if "로그인 정보" in r:
+    raise ConnectionError("failed to get shttl list: credentials expired")
+
 d = parse_shttl_list(r)
 
 
 for b in d:
-    print(b)
+    print("bus change!!!!!!!!!!!!!!!")
+    for key, value in b.items():
+        print(f"{key}: {value}")
