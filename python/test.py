@@ -47,38 +47,46 @@
 # print(departure_datetime)
 # print(str(departure_datetime.year) + format(departure_datetime.month, "0>2") + format(departure_datetime.day, "0>2"))
 
-import requests
+# import requests
 
-cookies = {
-    'WMONID': 'mW5O3G11u0p',
-    'JSESSIONID': 'Jz1Q37zY1Dw7WdU1Fi7j8U3nRUlQwdbSz7KdmMbGkDZvb1XLxVvZVqaSu2HAJIBM.amV1c19kb21haW4vaGFrc2EyXzE=',
-}
+# cookies = {
+#     'WMONID': 'mW5O3G11u0p',
+#     'JSESSIONID': 'Jz1Q37zY1Dw7WdU1Fi7j8U3nRUlQwdbSz7KdmMbGkDZvb1XLxVvZVqaSu2HAJIBM.amV1c19kb21haW4vaGFrc2EyXzE=',
+# }
 
-headers = {
-    'Accept': '*/*',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Connection': 'keep-alive',
-    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    # 'Cookie': 'WMONID=mW5O3G11u0p; JSESSIONID=Jz1Q37zY1Dw7WdU1Fi7j8U3nRUlQwdbSz7KdmMbGkDZvb1XLxVvZVqaSu2HAJIBM.amV1c19kb21haW4vaGFrc2EyXzE=',
-    'Origin': 'https://underwood1.yonsei.ac.kr',
-    'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
-    'X-Requested-With': 'XMLHttpRequest',
-    'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Windows"',
-}
+# headers = {
+#     'Accept': '*/*',
+#     'Accept-Language': 'en-US,en;q=0.9',
+#     'Connection': 'keep-alive',
+#     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+#     # 'Cookie': 'WMONID=mW5O3G11u0p; JSESSIONID=Jz1Q37zY1Dw7WdU1Fi7j8U3nRUlQwdbSz7KdmMbGkDZvb1XLxVvZVqaSu2HAJIBM.amV1c19kb21haW4vaGFrc2EyXzE=',
+#     'Origin': 'https://underwood1.yonsei.ac.kr',
+#     'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
+#     'Sec-Fetch-Dest': 'empty',
+#     'Sec-Fetch-Mode': 'cors',
+#     'Sec-Fetch-Site': 'same-origin',
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+#     'X-Requested-With': 'XMLHttpRequest',
+#     'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
+#     'sec-ch-ua-mobile': '?0',
+#     'sec-ch-ua-platform': '"Windows"',
+# }
 
-data = '_menuId=MzMzODYzMjY%3D&_menuNm=&_pgmId=MTg3NDA2&'
+# data = '_menuId=MzMzODYzMjY%3D&_menuNm=&_pgmId=MTg3NDA2&'
 
-response = requests.post(
-    'https://underwood1.yonsei.ac.kr/com/cnst/PropCtr/findViewSession.do',
-    cookies=cookies,
-    headers=headers,
-    data=data,
-)
+# response = requests.post(
+#     'https://underwood1.yonsei.ac.kr/com/cnst/PropCtr/findViewSession.do',
+#     cookies=cookies,
+#     headers=headers,
+#     data=data,
+# )
 
-print(response.content.decode())
+# print(response.content.decode())
+
+
+import ast
+#                                                                                                                                                                                                                                                                          !                                                                              !                    
+r = '{"gdmViewSession":{"msg":"success","userNm":"꾸씩루이지","encStr":"SvRXCvYqst4AsjKIvDSVdnpTiByoar4knruU0j6e9y8=","deptNm":"컴퓨팅계열","locale":"locale","deptCd":"32053","deptTtNm":"컴퓨팅계열","userSupport":"0!@#undefined","clientDevice":"normal","passPwdExpir":True,"persNo":"**replaced USERID using filter-repo**","wasInfo":"운영","socpsCd":"1110","passLoginPolicy":True,"sessionTimeout":3600,"campsDivCd":"G","userDivCd":"12","reltmNtcnRcptnYn":"1","pageZoom":"100"},"dmLoginConfirm":{"isLogin":"1"}}'
+#r = '{"gay":True}'
+d0 = ast.literal_eval(r)
+print(d0)

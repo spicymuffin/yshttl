@@ -1,4 +1,3 @@
-import requests
 import os
 import threading
 import time
@@ -6,12 +5,16 @@ import datetime
 import auth_master
 import server_interface
 
+# region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE_NAME = "config.txt"
 CONFIG_FILE_PATH = CURR_PATH + '\\' + CONFIG_FILE_NAME
 COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
 COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
-LOCAL_LIST_REFRESH_TIME = 60*5  # in seconds
+# endregion
+
+REFRESH_RATE = 1/4  # in seconds
+
 USERID = "**replaced USERID using filter-repo**"
 USERPW = "**replaced PW using filter-repo**"
 
@@ -19,25 +22,25 @@ WMONID = ""
 JSESSIONID = ""
 
 BOOK_QUEUE = []
-
-SHTTL_LIST_S = []
-SHTTL_LIST_I = []
+SHTTL_DICT = {"S": {}, "I": {}}
 
 ENABLE_CONSOLE = 1
 DEBUG = 1
 
-# region manage files
+FORCE_UPDATE_TIME = datetime.time(00, 39, 2)
+
+# region load cookies and config
 with open(CONFIG_FILE_PATH, 'w') as file:
     pass
 
 if os.path.exists(COOKIE_JAR_FILE_PATH):
-    with open(CONFIG_FILE_PATH, 'r') as file:
-        WMONID = file.readline()
+    with open(COOKIE_JAR_FILE_PATH, 'r') as file:
+        WMONID = file.readline()[:-1]
         JSESSIONID = file.readline()
-# endregion
 
 server_interface.WMONID = WMONID
 server_interface.JSESSIONID = JSESSIONID
+# endregion
 
 # region timetable format
 # we need a system to set a schedule:
@@ -72,7 +75,28 @@ def cinput(indent=False):
 # endregion
 
 
+class WishlistRoute:
+    """represent wishlisted routes
+    """
+
+    def __init__(self, _origin="S", _departure_datetime=datetime.datetime.now(), _max_delay=0) -> None:
+        self.origin = _origin
+        self.departure_datetime = _departure_datetime
+        self.max_delay = _max_delay
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self) -> str:
+        return f"""  date: {self.departure_datetime.date()}
+  time: {self.departure_datetime.time()}
+origin: {self.origin}"""
+
+
 class Route:
+    """represent existing routes
+    """
+
     def __init__(self, _origin="S", _departure_datetime=datetime.datetime.now(), _seats_available=-1) -> None:
         self.origin = _origin
         self.departure_datetime = _departure_datetime
@@ -102,6 +126,49 @@ class Route:
 origin: {self.origin}
 remdSt: {self.seats_available}"""
 
+
+def reset_SHTTL_DICT():
+    global SHTTL_DICT
+    SHTTL_DICT = {"S": {}, "I": {}}
+
+
+def update_SHTTL_DICT(_date):
+    """update internal representation of available routes on date _date
+
+    Args:
+        _origin (str): route origin S or I or B for both
+        _date (str): date in yyyymmdd format
+
+    Returns:
+        int: -1 on failure, 0 on success
+    """
+    global WMONID
+    global JSESSIONID
+
+    if not server_interface.check_login_state():
+        return -1
+
+    temp_lst_S = server_interface.get_shttl_list("S", _date)
+    temp_lst_I = server_interface.get_shttl_list("I", _date)
+
+    for i in range(len(temp_lst_S)):
+        rt = Route()
+        rt.import_dictionary(temp_lst_S[i])
+        if not _date in SHTTL_DICT["S"].keys():
+            SHTTL_DICT["S"][_date] = []
+        SHTTL_DICT["S"][_date].append(rt)
+
+    for i in range(len(temp_lst_I)):
+        rt = Route()
+        rt.import_dictionary(temp_lst_I[i])
+        if not _date in SHTTL_DICT["I"].keys():
+            SHTTL_DICT["I"][_date] = []
+        SHTTL_DICT["I"][_date].append(rt)
+
+    print(SHTTL_DICT)
+
+    return 0
+
 # region commands
 # region getcookies cmd
 
@@ -124,12 +191,6 @@ def getcookies_handler():
 
 
 # region book cmd
-
-# route origin (I/S) date max allowed dep time
-# arg format: xx mmdd h:m
-# ex:
-# book I 140623 24:00
-
 def insert_route_BOOK_QUEUE(_route):
     global BOOK_QUEUE
     lbq = len(BOOK_QUEUE)
@@ -145,7 +206,7 @@ def book_handler(args):
     if type(args_processed) == str:
         cprint(f"request couldnt be fullfilled: {args_processed}")
     else:
-        r = Route(args_processed[0], args_processed[1])
+        r = WishlistRoute(args_processed[0], args_processed[1])
         insert_route_BOOK_QUEUE(r)
         cprint(f"route was added to wishlist successfully")
 
@@ -213,49 +274,13 @@ def quit_handler():
     if r == 'y':
         quit(0)
 # endregion
+
+
+# region upd_shttl_list
+def upd_shttl_list_handler():
+    r = update_SHTTL_DICT()
 # endregion
-
-
-def update_SHTTL_LIST(_origin, _date):
-    """update internal representation of available routes
-
-    Args:
-        _origin (str): route origin S or I or B for both
-        _date (str): date in yyyymmdd format
-
-    Returns:
-        int: -1 on fail, 0 on success
-    """
-    global WMONID
-    global JSESSIONID
-
-    if not server_interface.check_login_state(WMONID, JSESSIONID):
-        return -1
-    if _origin == "B" or _origin == "S":
-        if DEBUG:
-            cprint("---------S---------")
-        temp_lst = server_interface.get_shttl_list("S", _date)
-        SHTTL_LIST_S.clear()
-        for i in range(len(temp_lst)):
-            rt = Route()
-            rt.import_dictionary(temp_lst[i])
-            SHTTL_LIST_S.append(rt)
-        if DEBUG:
-            cprint('\n-------------------\n'.join(map(str, SHTTL_LIST_S)))
-
-    if _origin == "B" or _origin == "I":
-        if DEBUG:
-            cprint("---------I---------")
-        temp_lst = server_interface.get_shttl_list("I", _date)
-        SHTTL_LIST_I.clear()
-        for i in range(len(temp_lst)):
-            rt = Route()
-            rt.import_dictionary(temp_lst[i])
-            SHTTL_LIST_I.append(rt)
-        if DEBUG:
-            cprint('\n-------------------\n'.join(map(str, SHTTL_LIST_I)))
-
-    return 0
+# endregion
 
 
 def console_handler():
@@ -273,15 +298,57 @@ def console_handler():
             cprint(f"{cmd} is not recognized as a command")
 
 
-def local_update():
-    while True:
-        time.sleep(LOCAL_LIST_REFRESH_TIME)
-        update_SHTTL_LIST()
+def datetime_date_to_str(_datetime):
+    return str(_datetime.year) + format(_datetime.month, "0>2") + format(_datetime.day, "0>2")
 
+
+def update_n3d(_now):
+    tmr = _now + datetime.timedelta(days=1)
+    ovm = _now + datetime.timedelta(days=2)
+    str_tmr = datetime_date_to_str(tmr)
+    str_ovm = datetime_date_to_str(ovm)
+    str_td = datetime_date_to_str(_now)
+
+    reset_SHTTL_DICT()
+    update_SHTTL_DICT(str_td)
+    update_SHTTL_DICT(str_tmr)
+    update_SHTTL_DICT(str_ovm)
+
+
+def check_book_queue(_now):
+    if len(BOOK_QUEUE) > 0:
+        rt = BOOK_QUEUE[0]
+        if rt.departure_datetime <= _now:
+            pass
+
+
+def local_update():
+    flag = False
+    currd = datetime.datetime.now().day
+    while True:
+        time.sleep(REFRESH_RATE)
+        now = datetime.datetime.now()
+
+        # force update when 2pm happens bc thats the time
+        # when new busses are added server-side
+        if not flag and now.hour >= FORCE_UPDATE_TIME.hour \
+                and now.minute >= FORCE_UPDATE_TIME.minute \
+                and now.second >= FORCE_UPDATE_TIME.second:
+            # update next three days
+            update_n3d(now)
+            # check book_queue
+            check_book_queue(now)
+            flag = True
+        if currd < now.day:
+            flag = False
+
+
+update_thread = threading.Thread(target=local_update)
+update_thread.daemon = True
+update_thread.start()
 
 if DEBUG:
     pass
-    update_SHTTL_LIST("B", "20230331")
 
 if ENABLE_CONSOLE:
     console_handler()

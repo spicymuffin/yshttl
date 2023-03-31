@@ -1,12 +1,6 @@
 import requests
-import os
+import ast
 import urllib
-
-CURR_PATH = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE_NAME = "config.txt"
-CONFIG_FILE_PATH = CURR_PATH + '\\' + CONFIG_FILE_NAME
-COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
-COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
 
 WMONID = ""
 JSESSIONID = ""
@@ -17,13 +11,6 @@ DEBUG = 0
 class AuthError(Exception):
     pass
 
-
-# open and read the file after the appending:
-with open(COOKIE_JAR_FILE_PATH, "r") as file:
-    WMONID = file.readline()[:-1]
-    JSESSIONID = file.readline()
-
-print(WMONID + JSESSIONID)
 
 class data_string_buider():
     def __init__(self) -> None:
@@ -37,13 +24,13 @@ class data_string_buider():
         self.ds += urllib.parse.quote(_value)
         return self.ds
 
-# region regionName
+# region check_login_state
 
 
-def check_login_state(_WMONID, _JSESSIONID):
+def check_login_state():
     check_login_state_r_cookies = {
-        'WMONID': _WMONID,
-        'JSESSIONID': _JSESSIONID,
+        'WMONID': WMONID,
+        'JSESSIONID': JSESSIONID,
     }
     check_login_state_r_headers = {
         'Accept': '*/*',
@@ -69,8 +56,11 @@ def check_login_state(_WMONID, _JSESSIONID):
         data=check_login_state_r_data,
     )
     res = check_login_state_r_response.content.decode()
-    d0 = dict()
-    print(d0)
+    res = res.replace("true", "True")
+    d0 = ast.literal_eval(res)
+    if DEBUG:
+        print(d0)
+    return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
 # endregion
 
 
@@ -164,10 +154,10 @@ def gen_request_shttl_list_data_string(_areaDivCd, _stdrDt, _resvePosblDt="1", _
     return dsb.ds
 
 
-def request_shttl_list(_WMONID, _JSESSIONID, _data_string):
+def request_shttl_list(_data_string):
     findShtlbusResveList_do_cookies = {
-        'WMONID': _WMONID,
-        'JSESSIONID': _JSESSIONID,
+        'WMONID': WMONID,
+        'JSESSIONID': JSESSIONID,
     }
 
     findShtlbusResveList_do_headers = {
@@ -433,7 +423,8 @@ def gen_book_shttl_data_string(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, 
 def get_shttl_list(_origin, _departure_datetime):
     s = gen_request_shttl_list_data_string(_origin, _departure_datetime)
 
-    r = request_shttl_list(WMONID, JSESSIONID, s)
+    r = request_shttl_list(s)
+    print(r)
 
     if "로그인 정보" in r:
         return AuthError("failed to get shttl list: credentials expired")
@@ -450,4 +441,4 @@ def get_shttl_list(_origin, _departure_datetime):
 # endregion
 
 
-#get_shttl_list("S", "20230331")
+# get_shttl_list("S", "20230331")
