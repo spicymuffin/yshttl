@@ -91,7 +91,21 @@
 # d0 = ast.literal_eval(r)
 # print(d0)
 
-a = {"alen": 1, "**replaced ALIAS using filter-repo**": 2, "oleg": 3}
+# a = {"alen": 1, "**replaced ALIAS using filter-repo**": 2, "oleg": 3}
 
-for i in range(1, len(a.keys())):
-    print(a[a.keys()[i]])
+# for i in range(1, len(a.keys())):
+#     print(a[a.keys()[i]])
+
+# import datetime
+
+# d1 = datetime.datetime(2023, 4, 1, 5, 45).timestamp()
+# d2 = datetime.datetime(2023, 4, 1, 5, 44).timestamp()
+
+# print((d2-d1))
+
+def a():
+    pass
+
+b = a
+
+print(b == a)

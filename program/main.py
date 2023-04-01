@@ -15,6 +15,8 @@ COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
 
 CLOCK_REFRESH_RATE = 1/4  # in seconds
 SHTTL_DICT_REFRESH_RATE = 10
+UPDATING_LOCK_NOTIFY_RATE = 1
+NOW = None
 
 USERID = "**replaced USERID using filter-repo**"
 USERPW = "**replaced PW using filter-repo**"
@@ -24,6 +26,7 @@ JSESSIONID = ""
 
 BOOK_QUEUE = []
 SHTTL_DICT = {"S": {}, "I": {}}
+UPDATING_LOCK = False
 
 ENABLE_CONSOLE = 1
 DEBUG = 1
@@ -116,10 +119,13 @@ class WishlistRoute:
     def __repr__(self):
         return str(self)
 
-    def __str__(self) -> str:
-        return f"""  date: {self.departure_datetime.date()}
+    def __str__(self, verbose=False) -> str:
+        if verbose:
+            return f"""  date: {self.departure_datetime.date()}
   time: {self.departure_datetime.time()}
 origin: {self.origin}"""
+        else:
+            return str(self.departure_datetime.time())
 
 
 class Route:
@@ -140,7 +146,7 @@ class Route:
         month = int(_dct["stdrDt"][5:6])
         day = int(_dct["stdrDt"][7:8])
         hour = int(_dct["beginTm"][0:2])
-        minute = int(_dct["beginTm"][3:4])
+        minute = int(_dct["beginTm"][2:4])
         self.departure_datetime = datetime.datetime(
             year, month, day, hour, minute)
         self.seats_available = int(_dct["remndSeat"])
@@ -151,11 +157,14 @@ class Route:
     def __repr__(self):
         return str(self)
 
-    def __str__(self) -> str:
-        return f"""  date: {self.departure_datetime.date()}
+    def __str__(self, verbose=False) -> str:
+        if verbose:
+            return f"""  date: {self.departure_datetime.date()}
   time: {self.departure_datetime.time()}
 origin: {self.origin}
 remdSt: {self.seats_available}"""
+        else:
+            return str(self.departure_datetime.time())
 
 
 def reset_SHTTL_DICT():
@@ -177,7 +186,7 @@ def update_SHTTL_DICT(_date):
     global JSESSIONID
 
     # TODO: we dont have to check login state literally every time
-    if not server_interface.check_login_state():
+    if not server_interface.check_login():
         return -1
 
     temp_lst_S = server_interface.get_shttl_list("S", _date)
@@ -197,15 +206,79 @@ def update_SHTTL_DICT(_date):
             SHTTL_DICT["I"][_date] = []
         SHTTL_DICT["I"][_date].append(rt)
 
-    print(SHTTL_DICT)
+    # print(SHTTL_DICT)
 
     return 0
+
+
+def update_n3d(_now):
+    global UPDATING_LOCK
+    UPDATING_LOCK = True
+    tmr = _now + datetime.timedelta(days=1)
+    ovm = _now + datetime.timedelta(days=2)
+    str_tmr = datetime_to_str_date(tmr)
+    str_ovm = datetime_to_str_date(ovm)
+    str_td = datetime_to_str_date(_now)
+
+    reset_SHTTL_DICT()
+    update_SHTTL_DICT(str_td)
+    update_SHTTL_DICT(str_tmr)
+    update_SHTTL_DICT(str_ovm)
+    UPDATING_LOCK = False
+    return (str_td, str_tmr, str_ovm)
+
+
+def check_book_queue(_now):
+
+    if not len(BOOK_QUEUE) > 0:
+        cprint("BOOK_QUEUE empty")
+        return
+
+    tmr = _now + datetime.timedelta(days=1)
+    ovm = _now + datetime.timedelta(days=2)
+    str_td = datetime_to_str_date(_now)
+    str_tmr = datetime_to_str_date(tmr)
+    str_ovm = datetime_to_str_date(ovm)
+
+    lst = [str_td, str_tmr, str_ovm]
+
+    rt = BOOK_QUEUE[0]
+    if rt.str_departure_date in lst:
+        bs_lst = SHTTL_DICT[rt.origin][rt.str_departure_date]
+        min_diff = 24*60*60  # max minutes in a day
+        min_diff_index = None
+        found = False
+        for i in range(len(bs_lst)):
+            diff = rt.departure_datetime.timestamp(
+            ) - bs_lst[i].departure_datetime.timestamp()
+
+            if diff < 0:
+                break
+
+            if min_diff > diff and diff >= 0:
+                print(min_diff)
+                print(diff)
+                min_diff_index = i
+                min_diff = diff
+                found = True
+
+        if found:
+            cprint(f"""successfully booked shttl:
+    date: {bs_lst[min_diff_index].departure_datetime.date()}
+    time: {bs_lst[min_diff_index].departure_datetime.time()}""")
+        else:
+            cprint(f"""failed to book shttl:
+    date: {rt.departure_datetime.date()}
+    time: {rt.departure_datetime.time()}""")
+
+    BOOK_QUEUE.pop(0)
+
 
 # region commands
 # region getcookies cmd
 
 
-def getcookies_handler():
+def getcookies_handler(args):
     global WMONID
     global JSESSIONID
     cookies = auth_master.get_auth_cookies(USERID, USERPW)
@@ -234,6 +307,7 @@ def insert_route_BOOK_QUEUE(_route):
 
 
 def book_handler(args):
+    global NOW
     args_processed = book_argument_parser(args)
     if type(args_processed) == str:
         cprint(f"request couldnt be fullfilled: {args_processed}")
@@ -241,6 +315,7 @@ def book_handler(args):
         r = WishlistRoute(args_processed[0], args_processed[1])
         insert_route_BOOK_QUEUE(r)
         cprint(f"route was added to wishlist successfully")
+        check_book_queue(NOW)
 
 
 def book_argument_parser(args):
@@ -268,10 +343,10 @@ def book_argument_parser(args):
                 else:
                     year = today_date.year
 
-            elif len(args[2]) == 6:
-                month = args[2][0:2]
-                day = args[2][2:4]
-                year = int("20" + args[2][4:6])
+            elif len(args[2]) == 8:
+                year = int(args[2][0:4])
+                month = args[2][4:6]
+                day = args[2][6:8]
             else:
                 return "DateArgFormatError"
         except:
@@ -300,7 +375,7 @@ def book_argument_parser(args):
 
 
 # region quit cmd
-def quit_handler():
+def quit_handler(args):
     cprint("quit? (type 'y' to confirm)")
     r = cinput(1)
     if r == 'y':
@@ -308,104 +383,136 @@ def quit_handler():
 # endregion
 
 
-# region upd_shttl_list
-def upd_shttl_list_handler():
-    r = update_SHTTL_DICT()
+# region updshttllist cmd
+def updshttllist_handler(args):
+    now = datetime.datetime.now()
+    r = update_n3d(now)
+
+    cprint(f"""Updated internal list:
+    {r[0]}:
+     S->I: {format(len(SHTTL_DICT['S'][r[0]]), "0>2") if r[0] in SHTTL_DICT['S'].keys() else "00"} shttls
+     I->S: {format(len(SHTTL_DICT['I'][r[0]]), "0>2") if r[0] in SHTTL_DICT['I'].keys() else "00"} shttls
+    {r[1]}:
+     S->I: {format(len(SHTTL_DICT['S'][r[1]]), "0>2") if r[1] in SHTTL_DICT['S'].keys() else "00"} shttls
+     I->S: {format(len(SHTTL_DICT['I'][r[1]]), "0>2") if r[1] in SHTTL_DICT['I'].keys() else "00"} shttls
+    {r[2]}:
+     S->I: {format(len(SHTTL_DICT['S'][r[2]]), "0>2") if r[2] in SHTTL_DICT['S'].keys() else "00"} shttls
+     I->S: {format(len(SHTTL_DICT['I'][r[2]]), "0>2") if r[2] in SHTTL_DICT['I'].keys() else "00"} shttls""")
+# endregion
+
+
+# region bookqueue cmd
+def bookqueue_handler(args):
+    cprint(list(map(str, BOOK_QUEUE)))
+# endregion
+
+
+# region shttldict cmd
+def shttldict_handler(args):
+    cprint(SHTTL_DICT)
+# endregion
+
+
+# region clear cmd
+def clear_handler(args):
+    os.system('cls')
 # endregion
 # endregion
+
+
+a**replaced ALIAS using filter-repo**s_book = ["book"]
+a**replaced ALIAS using filter-repo**s_quit_handler = ["quit"]
+a**replaced ALIAS using filter-repo**s_getcookies_handler = ["getcookies", "gc"]
+a**replaced ALIAS using filter-repo**s_updshttllist = ["updshttllist", "updateshuttlelist", "usl"]
+a**replaced ALIAS using filter-repo**s_bookqueue = ["bookqueue", "bq"]
+a**replaced ALIAS using filter-repo**s_shttldict = ["shttldict", "sd"]
+a**replaced ALIAS using filter-repo**s_clear = ["clear"]
+
+
+def tr_wrapper(func, args):
+    if func == book_handler:
+        while UPDATING_LOCK:
+            cprint("locked. wait")
+            time.sleep(UPDATING_LOCK_NOTIFY_RATE)
+    func(args)
 
 
 def console_handler():
+    global CMD_QUEUE
     while True:
         inp = cinput()
         inp_parsed = inp.split(" ")
         cmd = inp_parsed[0]
-        if cmd == "book":
-            book_handler(inp_parsed)
-        elif cmd == "quit":
-            quit_handler()
-        elif cmd == "getcookies":
-            getcookies_handler()
+        exec = None
+        if cmd in a**replaced ALIAS using filter-repo**s_book:
+            exec = (book_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_quit_handler:
+            exec = (quit_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_getcookies_handler:
+            exec = (getcookies_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_updshttllist:
+            exec = (updshttllist_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_bookqueue:
+            exec = (bookqueue_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_shttldict:
+            exec = (shttldict_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_clear:
+            exec = (clear_handler, inp_parsed)
         else:
             cprint(f"{cmd} is not recognized as a command")
+        if exec != None:
+            tr_wrapper(exec[0], exec[1],)
 
 
-def update_n3d(_now):
-    tmr = _now + datetime.timedelta(days=1)
-    ovm = _now + datetime.timedelta(days=2)
-    str_tmr = datetime_to_str_date(tmr)
-    str_ovm = datetime_to_str_date(ovm)
-    str_td = datetime_to_str_date(_now)
-
-    reset_SHTTL_DICT()
-    update_SHTTL_DICT(str_td)
-    update_SHTTL_DICT(str_tmr)
-    update_SHTTL_DICT(str_ovm)
-
-    lst = [str_td, str_tmr, str_ovm]
-    print(lst)
-
-
-def check_book_queue(_now):
-
-    if not len(BOOK_QUEUE) > 0:
-        return
-
-    tmr = _now + datetime.timedelta(days=1)
-    ovm = _now + datetime.timedelta(days=2)
-    str_td = datetime_to_str_date(_now)
-    str_tmr = datetime_to_str_date(tmr)
-    str_ovm = datetime_to_str_date(ovm)
-
-    lst = [str_td, str_tmr, str_ovm]
-
-    rt = BOOK_QUEUE[0]
-    if rt.str_departure_date in lst:
-        bs_lst = SHTTL_DICT[rt.origin][rt.str_departure_date]
-        for i in range(len(bs_lst)):
-            if bs_lst[i].departure_datetime < rt.departure_datetime:
-                bs_lst[i].departure_datetime.book()
+def startup():
+    global NOW
+    NOW = datetime.datetime.now()
+    update_n3d(NOW)
 
 
 def clock_upd():
+    global NOW
     flag = False
     currd = datetime.datetime.now().day
     while True:
         time.sleep(CLOCK_REFRESH_RATE)
-        now = datetime.datetime.now()
+        NOW = datetime.datetime.now()
 
         # force update when 2pm happens bc thats the time
         # when new busses are added server-side
-        if not flag and now.hour >= FORCE_UPDATE_TIME.hour \
-                and now.minute >= FORCE_UPDATE_TIME.minute \
-                and now.second >= FORCE_UPDATE_TIME.second:
+        if not flag and NOW.hour >= FORCE_UPDATE_TIME.hour \
+                and NOW.minute >= FORCE_UPDATE_TIME.minute \
+                and NOW.second >= FORCE_UPDATE_TIME.second:
             # update next three days
-            update_n3d(now)
+            update_n3d(NOW)
             # check book_queue
-            check_book_queue(now)
+            check_book_queue(NOW)
             flag = True
-        if currd < now.day:
+        if currd < NOW.day:
             flag = False
 
 
 def shttl_dict_upd():
+    global NOW
     while True:
         time.sleep(SHTTL_DICT_REFRESH_RATE)
-        update_n3d(datetime.datetime.now())
+        update_n3d(NOW)
 
 
 thread_clock_upd = threading.Thread(target=clock_upd)
 thread_clock_upd.daemon = True
-#thread_clock_upd.start()
+thread_clock_upd.start()
 
 thread_shttl_dict_upd = threading.Thread(target=shttl_dict_upd)
 thread_shttl_dict_upd.daemon = True
-#thread_shttl_dict_upd.start()
+thread_shttl_dict_upd.start()
 
 if DEBUG:
-    s = server_interface.get_shttl_list("S", "20230403")
-    print(s)
+    #s = server_interface.get_shttl_list("S", "20230403")
+    # print(s)
     pass
+
+startup()
 
 if ENABLE_CONSOLE:
     console_handler()

@@ -24,48 +24,10 @@ class data_string_buider():
         self.ds += urllib.parse.quote(_value)
         return self.ds
 
-# region check_login_state
 
-
-def check_login_state():
-    check_login_state_r_cookies = {
-        'WMONID': WMONID,
-        'JSESSIONID': JSESSIONID,
-    }
-    check_login_state_r_headers = {
-        'Accept': '*/*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Origin': 'https://underwood1.yonsei.ac.kr',
-        'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-origin',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
-        'X-Requested-With': 'XMLHttpRequest',
-        'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-    }
-    check_login_state_r_data = '_menuId=MzMzODYzMjY%3D&_menuNm=&_pgmId=MTg3NDA2&'
-    check_login_state_r_response = requests.post(
-        'https://underwood1.yonsei.ac.kr/com/cnst/PropCtr/findViewSession.do',
-        cookies=check_login_state_r_cookies,
-        headers=check_login_state_r_headers,
-        data=check_login_state_r_data,
-    )
-    res = check_login_state_r_response.content.decode()
-    res = res.replace("true", "True")
-    d0 = ast.literal_eval(res)
-    if DEBUG:
-        print(d0)
-    return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
-# endregion
-
-
-# region request_shttl_list
-def gen_request_shttl_list_data_string(_areaDivCd, _stdrDt, _resvePosblDt="2", _seatDivCd="1", _areaDivCd2="", _stdrDt2="12312312", _userDivCd="12", _d_hashtag="@d1#", _d_one_hastag="dmCond", _tp="dm"):
+# region request handlers
+# region request_get_shttl_list
+def gen_data_string_request_shttl_list(_areaDivCd, _stdrDt, _resvePosblDt="2", _seatDivCd="1", _areaDivCd2="", _stdrDt2="12312312", _userDivCd="12", _d_hashtag="@d1#", _d_one_hastag="dmCond", _tp="dm"):
     """_summary_
 
     Args:
@@ -190,7 +152,7 @@ def request_shttl_list(_data_string):
     return findShtlbusResveList_do_response.content.decode()
 
 
-def parse_request_shttl_list_response(resp):
+def parse_request_shttl_list(resp):
     index = 0
     while resp[index] != "[":
         index += 1
@@ -244,7 +206,8 @@ def parse_request_shttl_list_response(resp):
 # endregion
 
 
-def gen_book_shttl_data_string(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, _d1_beginTm, _d1_endTm, _d1_tm, _d1_thrstNm, _d1_remrk, _d1_remndSeat, _d1_resveWaitPcnt, _d1_resveYn, _d1_resveWaitYn, _d1_resveResnDivCd, _d1_dailResvePosblYn, _d1_areaDivCd__origin, _d1_busCd__origin, _d1_stdrDt__origin, _d1_beginTm__origin, _d2_seatDivCd, _d2_userDivCd, _d2_empty, _d2_tp):
+# region request_book_shttl
+def gen_data_string_request_book_shttl(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, _d1_beginTm, _d1_endTm, _d1_tm, _d1_thrstNm, _d1_remrk, _d1_remndSeat, _d1_resveWaitPcnt, _d1_resveYn, _d1_resveWaitYn, _d1_resveResnDivCd, _d1_dailResvePosblYn, _d1_areaDivCd__origin, _d1_busCd__origin, _d1_stdrDt__origin, _d1_beginTm__origin, _d2_seatDivCd, _d2_userDivCd, _d2_empty, _d2_tp):
     dsb = data_string_buider()
 
     # vars
@@ -419,43 +382,83 @@ def gen_book_shttl_data_string(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, 
     return dsb.ds
 
 
-def book_shttl(_data):
-    ds = gen_book_shttl_data_string(_data["areaDivCd"],
-                               _data["busCd"],
-                               _data["busNm"],
-                               _data["stdrDt"],
-                               _data["beginTm"],
-                               _data["endTm"],
-                               _data["tm"],
-                               _data["thrstNm"],
-                               _data["remrk"],
-                               _data["remndSeat"],
-                               _data["resveWaitPcnt"],
-                               _data["resveYn"],
-                               _data["resveWaitYn"],
-                               _data["resveResnDivCd"],
-                               _data["dailResvePosblYn"],
-                               _data["areaDivCd"],
-                               _data["busCd"],
-                               _data["stdrDt"],
-                               _data["beginTm"],
-                               "1",
-                               "12",
-                               "dmCond",
-                               "dm")
+def request_book_shttl(_data_string):
+    saveShtlbusResveList_do_cookies = {
+        'WMONID': WMONID,
+        'JSESSIONID': JSESSIONID,
+    }
 
+    saveShtlbusResveList_do_headers = {
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        # 'Cookie': 'WMONID=N38l9lUXcEb; cugubun=EVvQjSkCameUAVyVgieUAVzWmcSG; UbiResult=MRxhvwJB/cG8+H9KsVmYpg==; JSESSIONID=I7gYqQZLAKeJkCeEbewwj1n1S4yNy5q1vodDqT7ASKmkkM5UxY9NBhlbCKYloBqv.amV1c19kb21haW4vaGFrc2ExXzE=',
+        'Origin': 'https://underwood1.yonsei.ac.kr',
+        'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest',
+        'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+    }
+
+    saveShtlbusResveList_do_data = _data_string
+
+    saveShtlbusResveList_do_response = requests.post(
+        'https://underwood1.yonsei.ac.kr/sch/shtl/ShtlrmCtr/saveShtlbusResveList.do',
+        cookies=saveShtlbusResveList_do_cookies,
+        headers=saveShtlbusResveList_do_headers,
+        data=saveShtlbusResveList_do_data,
+    )
+
+    return saveShtlbusResveList_do_response.content.decode()
+# endregion
+
+
+# region request user_info
+def request_user_info():
+    check_login_state_r_cookies = {
+        'WMONID': WMONID,
+        'JSESSIONID': JSESSIONID,
+    }
+    check_login_state_r_headers = {
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Origin': 'https://underwood1.yonsei.ac.kr',
+        'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest',
+        'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+    }
+    check_login_state_r_data = '_menuId=MzMzODYzMjY%3D&_menuNm=&_pgmId=MTg3NDA2&'
+    check_login_state_r_response = requests.post(
+        'https://underwood1.yonsei.ac.kr/com/cnst/PropCtr/findViewSession.do',
+        cookies=check_login_state_r_cookies,
+        headers=check_login_state_r_headers,
+        data=check_login_state_r_data,
+    )
+    return check_login_state_r_response.content.decode()
+# endregion
+# endregion
 
 # region high level wrappers
+
+
 def get_shttl_list(_origin, _departure_datetime):
-    ds = gen_request_shttl_list_data_string(_origin, _departure_datetime)
-    print(ds)
+    ds = gen_data_string_request_shttl_list(_origin, _departure_datetime)
     r = request_shttl_list(ds)
-    print(r)
-
-    if "로그인 정보" in r:
-        return AuthError("failed to get shttl list: credentials expired")
-
-    d = parse_request_shttl_list_response(r)
+    d = parse_request_shttl_list(r)
 
     if DEBUG:
         for b in d:
@@ -464,4 +467,43 @@ def get_shttl_list(_origin, _departure_datetime):
                 print(f"{key}: {value}")
 
     return d
+
+
+def book_shttl(_data):
+    ds = gen_data_string_request_book_shttl(_data["areaDivCd"],
+                                            _data["busCd"],
+                                            _data["busNm"],
+                                            _data["stdrDt"],
+                                            _data["beginTm"],
+                                            _data["endTm"],
+                                            _data["tm"],
+                                            _data["thrstNm"],
+                                            _data["remrk"],
+                                            _data["remndSeat"],
+                                            _data["resveWaitPcnt"],
+                                            _data["resveYn"],
+                                            _data["resveWaitYn"],
+                                            _data["resveResnDivCd"],
+                                            _data["dailResvePosblYn"],
+                                            _data["areaDivCd"],
+                                            _data["busCd"],
+                                            _data["stdrDt"],
+                                            _data["beginTm"],
+                                            "1",
+                                            "12",
+                                            "dmCond",
+                                            "dm")
+
+    r = request_book_shttl(ds)
+
+    print(r)
+
+
+def check_login():
+    r = request_user_info()
+    r = r.replace("true", "True")
+    d0 = ast.literal_eval(r)
+    if DEBUG:
+        print(d0)
+    return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
 # endregion
