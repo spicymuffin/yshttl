@@ -84,9 +84,14 @@
 # print(response.content.decode())
 
 
-import ast
-#                                                                                                                                                                                                                                                                          !                                                                              !                    
-r = '{"gdmViewSession":{"msg":"success","userNm":"꾸씩루이지","encStr":"SvRXCvYqst4AsjKIvDSVdnpTiByoar4knruU0j6e9y8=","deptNm":"컴퓨팅계열","locale":"locale","deptCd":"32053","deptTtNm":"컴퓨팅계열","userSupport":"0!@#undefined","clientDevice":"normal","passPwdExpir":True,"persNo":"**replaced USERID using filter-repo**","wasInfo":"운영","socpsCd":"1110","passLoginPolicy":True,"sessionTimeout":3600,"campsDivCd":"G","userDivCd":"12","reltmNtcnRcptnYn":"1","pageZoom":"100"},"dmLoginConfirm":{"isLogin":"1"}}'
-#r = '{"gay":True}'
-d0 = ast.literal_eval(r)
-print(d0)
+# import ast
+# #                                                                                                                                                                                                                                                                          !                                                                              !
+# r = '{"gdmViewSession":{"msg":"success","userNm":"꾸씩루이지","encStr":"SvRXCvYqst4AsjKIvDSVdnpTiByoar4knruU0j6e9y8=","deptNm":"컴퓨팅계열","locale":"locale","deptCd":"32053","deptTtNm":"컴퓨팅계열","userSupport":"0!@#undefined","clientDevice":"normal","passPwdExpir":True,"persNo":"**replaced USERID using filter-repo**","wasInfo":"운영","socpsCd":"1110","passLoginPolicy":True,"sessionTimeout":3600,"campsDivCd":"G","userDivCd":"12","reltmNtcnRcptnYn":"1","pageZoom":"100"},"dmLoginConfirm":{"isLogin":"1"}}'
+# #r = '{"gay":True}'
+# d0 = ast.literal_eval(r)
+# print(d0)
+
+a = {"alen": 1, "**replaced ALIAS using filter-repo**": 2, "oleg": 3}
+
+for i in range(1, len(a.keys())):
+    print(a[a.keys()[i]])

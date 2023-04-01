@@ -13,7 +13,8 @@ COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
 COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
 # endregion
 
-REFRESH_RATE = 1/4  # in seconds
+CLOCK_REFRESH_RATE = 1/4  # in seconds
+SHTTL_DICT_REFRESH_RATE = 10
 
 USERID = "**replaced USERID using filter-repo**"
 USERPW = "**replaced PW using filter-repo**"
@@ -27,10 +28,10 @@ SHTTL_DICT = {"S": {}, "I": {}}
 ENABLE_CONSOLE = 1
 DEBUG = 1
 
-FORCE_UPDATE_TIME = datetime.time(00, 39, 2)
+FORCE_UPDATE_TIME = datetime.time(12, 0, 3)
 
 # region load cookies and config
-with open(CONFIG_FILE_PATH, 'w') as file:
+with open(CONFIG_FILE_PATH, 'r') as file:
     pass
 
 if os.path.exists(COOKIE_JAR_FILE_PATH):
@@ -75,6 +76,32 @@ def cinput(indent=False):
 # endregion
 
 
+# region formatter functions
+def datetime_to_str_date(_datetime):
+    """parse out date from datetime object and format it to yyyymmdd
+
+    Args:
+        _datetime (datetime): datetime to parse out the date from
+
+    Returns:
+        str: formatted date
+    """
+    return str(_datetime.year) + format(_datetime.month, "0>2") + format(_datetime.day, "0>2")
+
+
+def datetime_to_str_time(_datetime):
+    """parse out time from datetime object and format it to hhmm
+
+    Args:
+        _datetime (datetime): datetime to parse out the time from
+
+    Returns:
+        str: formatted time
+    """
+    return format(_datetime.hour, "0>2") + format(_datetime.minute, "0>2")
+# endregion
+
+
 class WishlistRoute:
     """represent wishlisted routes
     """
@@ -83,6 +110,8 @@ class WishlistRoute:
         self.origin = _origin
         self.departure_datetime = _departure_datetime
         self.max_delay = _max_delay
+        self.str_departure_date = datetime_to_str_date(_departure_datetime)
+        self.str_departure_time = datetime_to_str_time(_departure_datetime)
 
     def __repr__(self):
         return str(self)
@@ -101,9 +130,8 @@ class Route:
         self.origin = _origin
         self.departure_datetime = _departure_datetime
         self.seats_available = _seats_available
-        self.str_departure_date = str(_departure_datetime.year) + format(
-            _departure_datetime.month, "0>2") + format(_departure_datetime.day, "0>2")
-        self.str_departure_time = format(_departure_datetime.month, "0>2")
+        self.str_departure_date = datetime_to_str_date(_departure_datetime)
+        self.str_departure_time = datetime_to_str_time(_departure_datetime)
 
     def import_dictionary(self, _dct):
         self.dct = _dct
@@ -116,6 +144,9 @@ class Route:
         self.departure_datetime = datetime.datetime(
             year, month, day, hour, minute)
         self.seats_available = int(_dct["remndSeat"])
+
+    def book(self):
+        server_interface.book_shttl(self.dct)
 
     def __repr__(self):
         return str(self)
@@ -145,6 +176,7 @@ def update_SHTTL_DICT(_date):
     global WMONID
     global JSESSIONID
 
+    # TODO: we dont have to check login state literally every time
     if not server_interface.check_login_state():
         return -1
 
@@ -298,35 +330,48 @@ def console_handler():
             cprint(f"{cmd} is not recognized as a command")
 
 
-def datetime_date_to_str(_datetime):
-    return str(_datetime.year) + format(_datetime.month, "0>2") + format(_datetime.day, "0>2")
-
-
 def update_n3d(_now):
     tmr = _now + datetime.timedelta(days=1)
     ovm = _now + datetime.timedelta(days=2)
-    str_tmr = datetime_date_to_str(tmr)
-    str_ovm = datetime_date_to_str(ovm)
-    str_td = datetime_date_to_str(_now)
+    str_tmr = datetime_to_str_date(tmr)
+    str_ovm = datetime_to_str_date(ovm)
+    str_td = datetime_to_str_date(_now)
 
     reset_SHTTL_DICT()
     update_SHTTL_DICT(str_td)
     update_SHTTL_DICT(str_tmr)
     update_SHTTL_DICT(str_ovm)
 
+    lst = [str_td, str_tmr, str_ovm]
+    print(lst)
+
 
 def check_book_queue(_now):
-    if len(BOOK_QUEUE) > 0:
-        rt = BOOK_QUEUE[0]
-        if rt.departure_datetime <= _now:
-            pass
+
+    if not len(BOOK_QUEUE) > 0:
+        return
+
+    tmr = _now + datetime.timedelta(days=1)
+    ovm = _now + datetime.timedelta(days=2)
+    str_td = datetime_to_str_date(_now)
+    str_tmr = datetime_to_str_date(tmr)
+    str_ovm = datetime_to_str_date(ovm)
+
+    lst = [str_td, str_tmr, str_ovm]
+
+    rt = BOOK_QUEUE[0]
+    if rt.str_departure_date in lst:
+        bs_lst = SHTTL_DICT[rt.origin][rt.str_departure_date]
+        for i in range(len(bs_lst)):
+            if bs_lst[i].departure_datetime < rt.departure_datetime:
+                bs_lst[i].departure_datetime.book()
 
 
-def local_update():
+def clock_upd():
     flag = False
     currd = datetime.datetime.now().day
     while True:
-        time.sleep(REFRESH_RATE)
+        time.sleep(CLOCK_REFRESH_RATE)
         now = datetime.datetime.now()
 
         # force update when 2pm happens bc thats the time
@@ -343,11 +388,23 @@ def local_update():
             flag = False
 
 
-update_thread = threading.Thread(target=local_update)
-update_thread.daemon = True
-update_thread.start()
+def shttl_dict_upd():
+    while True:
+        time.sleep(SHTTL_DICT_REFRESH_RATE)
+        update_n3d(datetime.datetime.now())
+
+
+thread_clock_upd = threading.Thread(target=clock_upd)
+thread_clock_upd.daemon = True
+#thread_clock_upd.start()
+
+thread_shttl_dict_upd = threading.Thread(target=shttl_dict_upd)
+thread_shttl_dict_upd.daemon = True
+#thread_shttl_dict_upd.start()
 
 if DEBUG:
+    s = server_interface.get_shttl_list("S", "20230403")
+    print(s)
     pass
 
 if ENABLE_CONSOLE:

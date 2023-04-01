@@ -65,7 +65,7 @@ def check_login_state():
 
 
 # region request_shttl_list
-def gen_request_shttl_list_data_string(_areaDivCd, _stdrDt, _resvePosblDt="1", _seatDivCd="1", _areaDivCd2="20230330", _stdrDt2="", _userDivCd="12", _d_hashtag="@d1#", _d_one_hastag="dmCond", _tp="dm"):
+def gen_request_shttl_list_data_string(_areaDivCd, _stdrDt, _resvePosblDt="2", _seatDivCd="1", _areaDivCd2="", _stdrDt2="12312312", _userDivCd="12", _d_hashtag="@d1#", _d_one_hastag="dmCond", _tp="dm"):
     """_summary_
 
     Args:
@@ -419,11 +419,37 @@ def gen_book_shttl_data_string(_d1_areaDivCd, _d1_busCd, _d1_busNm, _d1_stdrDt, 
     return dsb.ds
 
 
+def book_shttl(_data):
+    ds = gen_book_shttl_data_string(_data["areaDivCd"],
+                               _data["busCd"],
+                               _data["busNm"],
+                               _data["stdrDt"],
+                               _data["beginTm"],
+                               _data["endTm"],
+                               _data["tm"],
+                               _data["thrstNm"],
+                               _data["remrk"],
+                               _data["remndSeat"],
+                               _data["resveWaitPcnt"],
+                               _data["resveYn"],
+                               _data["resveWaitYn"],
+                               _data["resveResnDivCd"],
+                               _data["dailResvePosblYn"],
+                               _data["areaDivCd"],
+                               _data["busCd"],
+                               _data["stdrDt"],
+                               _data["beginTm"],
+                               "1",
+                               "12",
+                               "dmCond",
+                               "dm")
+
+
 # region high level wrappers
 def get_shttl_list(_origin, _departure_datetime):
-    s = gen_request_shttl_list_data_string(_origin, _departure_datetime)
-
-    r = request_shttl_list(s)
+    ds = gen_request_shttl_list_data_string(_origin, _departure_datetime)
+    print(ds)
+    r = request_shttl_list(ds)
     print(r)
 
     if "로그인 정보" in r:
@@ -439,6 +465,3 @@ def get_shttl_list(_origin, _departure_datetime):
 
     return d
 # endregion
-
-
-# get_shttl_list("S", "20230331")
