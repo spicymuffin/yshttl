@@ -4,17 +4,18 @@ import time
 import datetime
 import auth_master
 import server_interface
+import json
 
 # region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE_NAME = "config.txt"
+CONFIG_FILE_NAME = "config.json"
 CONFIG_FILE_PATH = CURR_PATH + '\\' + CONFIG_FILE_NAME
 COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
 COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
 # endregion
 
 CLOCK_REFRESH_RATE = 1/4  # in seconds
-SHTTL_DICT_REFRESH_RATE = 10
+SHTTL_DICT_REFRESH_RATE = 20
 UPDATING_LOCK_NOTIFY_RATE = 1
 NOW = None
 
@@ -31,11 +32,17 @@ UPDATING_LOCK = False
 ENABLE_CONSOLE = 1
 DEBUG = 1
 
-FORCE_UPDATE_TIME = datetime.time(12, 0, 3)
+FORCE_UPDATE_TIME = datetime.time(13, 0, 3)
+
+SCHEDULE = {}
+DAYS_FROM_START = 7
+START_DAY = None
 
 # region load cookies and config
 with open(CONFIG_FILE_PATH, 'r') as file:
-    pass
+    SCHEDULE = json.load(file)
+
+print(SCHEDULE)
 
 if os.path.exists(COOKIE_JAR_FILE_PATH):
     with open(COOKIE_JAR_FILE_PATH, 'r') as file:
@@ -46,25 +53,25 @@ server_interface.WMONID = WMONID
 server_interface.JSESSIONID = JSESSIONID
 # endregion
 
+
 # region timetable format
 # we need a system to set a schedule:
 # timetable in config file:
 
 """
-MON si dep 8:00
+MON S 08:00
 TUE
 WED
 THU
-FRI so dep 10:00
+FRI I 10:00
 SAT
 SUN
 """
 # use this ^ format to tell program which days it should automatically book bus
 # endregion
 
+
 # region console i/o
-
-
 def cprint(msg):
     s = str(msg)
     s = s.replace('\n', '\n    ')
@@ -109,10 +116,9 @@ class WishlistRoute:
     """represent wishlisted routes
     """
 
-    def __init__(self, _origin="S", _departure_datetime=datetime.datetime.now(), _max_delay=0) -> None:
+    def __init__(self, _origin="S", _departure_datetime=datetime.datetime.now()) -> None:
         self.origin = _origin
         self.departure_datetime = _departure_datetime
-        self.max_delay = _max_delay
         self.str_departure_date = datetime_to_str_date(_departure_datetime)
         self.str_departure_time = datetime_to_str_time(_departure_datetime)
 
@@ -229,10 +235,14 @@ def update_n3d(_now):
 
 
 def check_book_queue(_now):
-
     if not len(BOOK_QUEUE) > 0:
         cprint("BOOK_QUEUE empty")
         return
+
+    while UPDATING_LOCK:
+        pass
+
+    # print(SHTTL_DICT)
 
     tmr = _now + datetime.timedelta(days=1)
     ovm = _now + datetime.timedelta(days=2)
@@ -243,6 +253,7 @@ def check_book_queue(_now):
     lst = [str_td, str_tmr, str_ovm]
 
     rt = BOOK_QUEUE[0]
+
     if rt.str_departure_date in lst:
         bs_lst = SHTTL_DICT[rt.origin][rt.str_departure_date]
         min_diff = 24*60*60  # max minutes in a day
@@ -252,32 +263,49 @@ def check_book_queue(_now):
             diff = rt.departure_datetime.timestamp(
             ) - bs_lst[i].departure_datetime.timestamp()
 
+            # print(diff, bs_lst[i].departure_datetime)
+
             if diff < 0:
                 break
 
-            if min_diff > diff and diff >= 0:
-                print(min_diff)
-                print(diff)
+            # print(min_diff)
+            # print(diff)
+            # print(bs_lst[i].seats_available)
+
+            # if min_diff > diff and bs_lst[i].seats_available == 0:
+            #     print(f"rejected {bs_lst[i].departure_datetime.time()}")
+
+            if min_diff > diff and bs_lst[i].seats_available > 0:
                 min_diff_index = i
                 min_diff = diff
                 found = True
 
         if found:
-            cprint(f"""successfully booked shttl:
+            # bs_lst[min_diff_index].book()
+            cprint(f"""successfully booked shttl before {rt.departure_datetime.time()}:
     date: {bs_lst[min_diff_index].departure_datetime.date()}
     time: {bs_lst[min_diff_index].departure_datetime.time()}""")
+            BOOK_QUEUE.pop(0)
         else:
             cprint(f"""failed to book shttl:
     date: {rt.departure_datetime.date()}
     time: {rt.departure_datetime.time()}""")
 
-    BOOK_QUEUE.pop(0)
+
+def insert_route_BOOK_QUEUE(_route):
+    global BOOK_QUEUE
+    inserted = False
+    for i in range(len(BOOK_QUEUE)):
+        if BOOK_QUEUE[i].departure_datetime >= _route.departure_datetime:
+            BOOK_QUEUE.insert(i, _route)
+            inserted = True
+    if inserted == False:
+        BOOK_QUEUE.append(_route)
+        return
 
 
 # region commands
 # region getcookies cmd
-
-
 def getcookies_handler(args):
     global WMONID
     global JSESSIONID
@@ -296,14 +324,6 @@ def getcookies_handler(args):
 
 
 # region book cmd
-def insert_route_BOOK_QUEUE(_route):
-    global BOOK_QUEUE
-    lbq = len(BOOK_QUEUE)
-    if lbq == 0:
-        BOOK_QUEUE.append(_route)
-    for i in range(lbq):
-        if BOOK_QUEUE[i].departure_datetime <= _route.departure_datetime:
-            BOOK_QUEUE.insert(_route, i+1)
 
 
 def book_handler(args):
@@ -464,16 +484,27 @@ def console_handler():
             tr_wrapper(exec[0], exec[1],)
 
 
-def startup():
-    global NOW
-    NOW = datetime.datetime.now()
-    update_n3d(NOW)
+def book_schedule_from_sd(delta):
+    global START_DAY
+    d = START_DAY + datetime.timedelta(days=delta)
+    dow_i = d.weekday()
+    # print(d)
+    rts = SCHEDULE[str(dow_i)]
+    for j in rts:
+        splt = j["time"].split(":")
+        hours = int(splt[0])
+        minutes = int(splt[1])
+        rdt = datetime.datetime(d.year, d.month, d.day, hours, minutes)
+        rt = WishlistRoute(j["origin"], rdt)
+        print(rt.__str__(0))
+        insert_route_BOOK_QUEUE(rt)
 
 
 def clock_upd():
     global NOW
+    global DAYS_FROM_START
     flag = False
-    currd = datetime.datetime.now().day
+    currd = NOW.day
     while True:
         time.sleep(CLOCK_REFRESH_RATE)
         NOW = datetime.datetime.now()
@@ -490,6 +521,9 @@ def clock_upd():
             flag = True
         if currd < NOW.day:
             flag = False
+            currd = NOW.day
+            book_schedule_from_sd(DAYS_FROM_START)
+            DAYS_FROM_START += 1
 
 
 def shttl_dict_upd():
@@ -499,20 +533,47 @@ def shttl_dict_upd():
         update_n3d(NOW)
 
 
-thread_clock_upd = threading.Thread(target=clock_upd)
-thread_clock_upd.daemon = True
-thread_clock_upd.start()
+def startup():
+    global NOW
+    global START_DAY
 
-thread_shttl_dict_upd = threading.Thread(target=shttl_dict_upd)
-thread_shttl_dict_upd.daemon = True
-thread_shttl_dict_upd.start()
+    if not server_interface.check_login():
+        cookies = auth_master.get_auth_cookies(USERID, USERPW)
+        if isinstance(cookies, Exception):
+            cprint(f"failed to authenticate: {cookies}")
+            return
+        with open(COOKIE_JAR_FILE_PATH, 'w') as file:
+            file.write(cookies[0] + '\n' + cookies[1])
+        WMONID = cookies[0]
+        JSESSIONID = cookies[1]
+        server_interface.WMONID = WMONID
+        server_interface.JSESSIONID = JSESSIONID
+
+    NOW = datetime.datetime.now()
+    START_DAY = NOW.date()
+    update_n3d(NOW)
+
+    for i in range(DAYS_FROM_START):
+        book_schedule_from_sd(i)
+
+    thread_clock_upd = threading.Thread(target=clock_upd)
+    thread_clock_upd.daemon = True
+    thread_clock_upd.start()
+
+    thread_shttl_dict_upd = threading.Thread(target=shttl_dict_upd)
+    thread_shttl_dict_upd.daemon = True
+    thread_shttl_dict_upd.start()
+
+    print(BOOK_QUEUE)
+
+
+startup()
 
 if DEBUG:
     #s = server_interface.get_shttl_list("S", "20230403")
     # print(s)
     pass
 
-startup()
 
 if ENABLE_CONSOLE:
     console_handler()

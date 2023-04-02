@@ -103,9 +103,17 @@
 
 # print((d2-d1))
 
-def a():
-    pass
+# def a():
+#     pass
 
-b = a
+# b = a
 
-print(b == a)
+# print(b == a)
+
+import datetime
+
+dt = datetime.datetime.now()
+
+for i in range(14):
+    asd = dt + datetime.timedelta(days=i)
+    print(asd.weekday())
