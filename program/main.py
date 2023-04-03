@@ -175,6 +175,18 @@ def get_cookies():
 
 
 def check_auth_and_exec(func, args):
+    if not server_interface.check_login():
+        cookies = auth_master.get_auth_cookies(USERID, USERPW)
+        if isinstance(cookies, Exception):
+            cprint(f"failed to authenticate: {cookies}")
+            return check_auth_and_exec(func, args)
+        with open(COOKIE_JAR_FILE_PATH, 'w') as file:
+            file.write(cookies[0] + '\n' + cookies[1])
+        WMONID = cookies[0]
+        JSESSIONID = cookies[1]
+        server_interface.WMONID = WMONID
+        server_interface.JSESSIONID = JSESSIONID
+
     return func(*args)
 
 
@@ -337,7 +349,14 @@ def getcookies_handler(args):
 # region debug
 def debug_handler(args):
     pass
-    check_auth_and_exec(check_book_queue, (NOW,))
+    global WMONID
+    global JSESSIONID
+    WMONID = "ASD"
+    JSESSIONID = "ASD"
+    server_interface.WMONID = WMONID
+    server_interface.JSESSIONID = JSESSIONID
+
+    # check_auth_and_exec(check_book_queue, (NOW,))
 # endregion
 
 

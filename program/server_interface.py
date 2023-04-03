@@ -458,6 +458,7 @@ def request_user_info():
 def get_shttl_list(_origin, _departure_datetime):
     ds = gen_data_string_request_shttl_list(_origin, _departure_datetime)
     r = request_shttl_list(ds)
+    print(r)
     d = parse_request_shttl_list(r)
 
     if DEBUG:
