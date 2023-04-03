@@ -577,6 +577,7 @@ def shttl_dict_upd():
         time.sleep(SHTTL_DICT_REFRESH_RATE)
         #cprint("HELLO!!", main=False)
         check_auth_and_exec(update_n3d, (NOW, ))
+        check_book_queue()
 
 
 def startup():
