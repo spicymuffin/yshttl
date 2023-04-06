@@ -452,9 +452,8 @@ def request_user_info():
 # endregion
 # endregion
 
+
 # region high level wrappers
-
-
 def get_shttl_list(_origin, _departure_datetime):
     ds = gen_data_string_request_shttl_list(_origin, _departure_datetime)
     r = request_shttl_list(ds)

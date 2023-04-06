@@ -257,7 +257,7 @@ def update_n3d(_now):
 
 def check_book_queue(_now):
     if not len(BOOK_QUEUE) > 0:
-        cprint("BOOK_QUEUE empty")
+        #cprint("BOOK_QUEUE empty")
         return
 
     j = 0
@@ -659,6 +659,3 @@ if DEBUG:
 
 if ENABLE_CONSOLE:
     console_handler()
-
-# requests code
-# r = requests.get()
