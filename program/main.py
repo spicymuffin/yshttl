@@ -141,7 +141,6 @@ class Route:
         day = int(_dct["stdrDt"][6:8])
         hour = int(_dct["beginTm"][0:2])
         minute = int(_dct["beginTm"][2:4])
-        print(year,month,day)
         self.departure_datetime = datetime.datetime(
             year, month, day, hour, minute)
         self.seats_available = int(_dct["remndSeat"])
