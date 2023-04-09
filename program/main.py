@@ -137,10 +137,11 @@ class Route:
         self.dct = _dct
         self.origin = _dct["areaDivCd"]
         year = int(_dct["stdrDt"][0:4])
-        month = int(_dct["stdrDt"][5:6])
-        day = int(_dct["stdrDt"][7:8])
+        month = int(_dct["stdrDt"][4:6])
+        day = int(_dct["stdrDt"][6:8])
         hour = int(_dct["beginTm"][0:2])
         minute = int(_dct["beginTm"][2:4])
+        print(year,month,day)
         self.departure_datetime = datetime.datetime(
             year, month, day, hour, minute)
         self.seats_available = int(_dct["remndSeat"])
@@ -313,6 +314,7 @@ def check_book_queue(_now):
             cprint(f"""failed to book shttl:
     date: {rt.departure_datetime.date()}
     time: {rt.departure_datetime.time()}""")
+            BOOK_QUEUE.pop(0)
 
 
 def insert_route_BOOK_QUEUE(_route):
