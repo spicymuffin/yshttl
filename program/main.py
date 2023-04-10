@@ -604,7 +604,6 @@ def shttl_dict_upd():
         cprint("shttl_dict updated", main=False)
 
 
-
 thread_clock_upd = None
 thread_shttl_dict_upd = None
 
@@ -614,11 +613,13 @@ def watchdog():
     global thread_shttl_dict_upd
     while True:
         if not thread_clock_upd.is_alive():
+            cprint("thread_clock_upd restarting...", main=False)
             thread_clock_upd = threading.Thread(target=clock_upd)
             thread_clock_upd.daemon = True
             thread_clock_upd.start()
 
         if not thread_shttl_dict_upd.is_alive():
+            cprint("thread_shttl_dict_upd restarting...", main=False)
             thread_shttl_dict_upd = threading.Thread(target=shttl_dict_upd)
             thread_shttl_dict_upd.daemon = True
             thread_shttl_dict_upd.start()
@@ -677,14 +678,11 @@ def startup():
     watchdog_thread.daemon = True
     watchdog_thread.start()
 
-    # print(BOOK_QUEUE)
+
 startup()
 
 if DEBUG:
-    #s = server_interface.get_shttl_list("S", "20230403")
-    # print(s)
     pass
-
 
 if ENABLE_CONSOLE:
     console_handler()

@@ -100,9 +100,9 @@ def get_auth_cookies(_userid, _userpw):
         }
 
         SSOLegacy_do_prelogin_r_response = requests.post('https://underwood1.yonsei.ac.kr/SSOLegacy.do',
-                                                         cookies=SSOLegacy_do_prelogin_r_cookies,
-                                                         headers=SSOLegacy_do_prelogin_r_headers,
-                                                         data=SSOLegacy_do_prelogin_r_data)
+                                                            cookies=SSOLegacy_do_prelogin_r_cookies,
+                                                            headers=SSOLegacy_do_prelogin_r_headers,
+                                                            data=SSOLegacy_do_prelogin_r_data)
         # endregion
 
         # region dissect SSOLegacy_do_prelogin_r
@@ -173,6 +173,8 @@ def get_auth_cookies(_userid, _userpw):
             index += 1
 
         PmSSOService_r_response_content = PmSSOService_r_response.content.decode()
+        if PmSSOService_r_response_content.find("연동대상시스템의 정상적인 요청이 아닙니다") != -1:
+            return get_auth_cookies(_userid, _userpw)
         scan_i = PmSSOService_r_response_content.rfind(
             "rsa.setPublic")
 
@@ -208,7 +210,7 @@ def get_auth_cookies(_userid, _userpw):
         userpw = _userpw
 
         jsonObj = {'userid': userid, 'userpw': userpw,
-                   'ssoChallenge': ssoChallenge}
+                    'ssoChallenge': ssoChallenge}
 
         y = json.dumps(jsonObj, separators=(',', ':'))
         message = str(y)
@@ -258,7 +260,7 @@ def get_auth_cookies(_userid, _userpw):
             ('E4', ''),
             ('ssoGubun', 'Redirect'),
             ('refererUrl',
-             'https://underwood1.yonsei.ac.kr/passni/spLogin.jsp?returnUrl=L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl&locale={locale}'),
+'https://underwood1.yonsei.ac.kr/passni/spLogin.jsp?returnUrl=L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl&locale={locale}'),
             ('a', 'aaaa'),
             ('b', 'bbbb'),
             ('returnUrl', 'L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl'),
@@ -357,10 +359,10 @@ def get_auth_cookies(_userid, _userpw):
         }
 
         SSOLegacy_do_pname_spLogin_r_response = requests.post('https://underwood1.yonsei.ac.kr/SSOLegacy.do',
-                                                              params=SSOLegacy_do_pname_spLogin_r_params,
-                                                              cookies=SSOLegacy_do_pname_spLogin_r_cookies,
-                                                              headers=SSOLegacy_do_pname_spLogin_r_headers,
-                                                              data=SSOLegacy_do_pname_spLogin_r_data)
+                                                                params=SSOLegacy_do_pname_spLogin_r_params,
+                                                                cookies=SSOLegacy_do_pname_spLogin_r_cookies,
+                                                                headers=SSOLegacy_do_pname_spLogin_r_headers,
+                                                                data=SSOLegacy_do_pname_spLogin_r_data)
         # endregion
 
         # region spLoginProcess_jsp_1_r
@@ -410,8 +412,8 @@ def get_auth_cookies(_userid, _userpw):
         }
 
         spLoginProcess_jsp_2_r_response = requests.get('https://underwood1.yonsei.ac.kr/passni/spLoginProcess.jsp',
-                                                       cookies=spLoginProcess_jsp_2_r_cookies,
-                                                       headers=spLoginProcess_jsp_2_r_headers)
+                                                        cookies=spLoginProcess_jsp_2_r_cookies,
+                                                        headers=spLoginProcess_jsp_2_r_headers)
         # endregion
 
         # region j_login_sso_do_r
