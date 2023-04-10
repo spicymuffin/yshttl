@@ -281,7 +281,6 @@ def check_book_queue(_now):
     rt = BOOK_QUEUE[0]
 
     while rt.str_departure_date in lst:
-        rt = BOOK_QUEUE[0]
         bs_lst = SHTTL_DICT[rt.origin][rt.str_departure_date]
         min_diff = 24*60*60  # max minutes in a day
         min_diff_index = None
@@ -315,6 +314,7 @@ def check_book_queue(_now):
     date: {rt.departure_datetime.date()}
     time: {rt.departure_datetime.time()}""")
             BOOK_QUEUE.pop(0)
+        rt = BOOK_QUEUE[0]
 
 
 def insert_route_BOOK_QUEUE(_route):
