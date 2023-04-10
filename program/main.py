@@ -280,7 +280,8 @@ def check_book_queue(_now):
 
     rt = BOOK_QUEUE[0]
 
-    if rt.str_departure_date in lst:
+    while rt.str_departure_date in lst:
+        rt = BOOK_QUEUE[0]
         bs_lst = SHTTL_DICT[rt.origin][rt.str_departure_date]
         min_diff = 24*60*60  # max minutes in a day
         min_diff_index = None
@@ -565,42 +566,67 @@ def book_schedule_from_sd(delta):
 
 
 def clock_upd():
-    global NOW
-    global DAYS_FROM_START
-    flag = False
-    currd = NOW.day
-    while True:
-        time.sleep(CLOCK_REFRESH_RATE)
-        NOW = datetime.datetime.now()
+    try:
+        global NOW
+        global DAYS_FROM_START
+        flag = False
+        currd = NOW.day
+        while True:
+            time.sleep(CLOCK_REFRESH_RATE)
+            NOW = datetime.datetime.now()
 
-        # force update when 2pm happens bc thats the time
-        # when new busses are added server-side
-        if not flag and NOW.hour >= FORCE_UPDATE_TIME.hour \
-                and NOW.minute >= FORCE_UPDATE_TIME.minute \
-                and NOW.second >= FORCE_UPDATE_TIME.second:
-            # update next three days
-            check_auth_and_exec(update_n3d, (NOW, ))
-            # check book_queue
-            check_auth_and_exec(check_book_queue, (NOW, ))
-            cprint("forced usl, checked bookings", main=False)
-            flag = True
-        if currd < NOW.day:
-            flag = False
-            currd = NOW.day
-            book_schedule_from_sd(DAYS_FROM_START)
-            DAYS_FROM_START += 1
+            # force update when 2pm happens bc thats the time
+            # when new busses are added server-side
+            if not flag and NOW.hour >= FORCE_UPDATE_TIME.hour \
+                    and NOW.minute >= FORCE_UPDATE_TIME.minute \
+                    and NOW.second >= FORCE_UPDATE_TIME.second:
+                # update next three days
+                check_auth_and_exec(update_n3d, (NOW, ))
+                # check book_queue
+                check_auth_and_exec(check_book_queue, (NOW, ))
+                cprint("forced usl, checked bookings", main=False)
+                flag = True
+            if currd < NOW.day:
+                flag = False
+                currd = NOW.day
+                book_schedule_from_sd(DAYS_FROM_START)
+                DAYS_FROM_START += 1
+    except Exception as ex:
+        cprint(f"CRASH! clock_upd_thread dead: {ex}", main=False)
 
 
 def shttl_dict_upd():
     global NOW
     while True:
         time.sleep(SHTTL_DICT_REFRESH_RATE)
-        #cprint("HELLO!!", main=False)
         check_auth_and_exec(update_n3d, (NOW, ))
         check_book_queue(NOW)
+        cprint("shttl_dict updated", main=False)
+
+
+
+thread_clock_upd = None
+thread_shttl_dict_upd = None
+
+
+def watchdog():
+    global thread_clock_upd
+    global thread_shttl_dict_upd
+    while True:
+        if not thread_clock_upd.is_alive():
+            thread_clock_upd = threading.Thread(target=clock_upd)
+            thread_clock_upd.daemon = True
+            thread_clock_upd.start()
+
+        if not thread_shttl_dict_upd.is_alive():
+            thread_shttl_dict_upd = threading.Thread(target=shttl_dict_upd)
+            thread_shttl_dict_upd.daemon = True
+            thread_shttl_dict_upd.start()
 
 
 def startup():
+    global thread_clock_upd
+    global thread_shttl_dict_upd
     global NOW
     global START_DAY
     global SCHEDULE
@@ -647,9 +673,11 @@ def startup():
     thread_shttl_dict_upd.daemon = True
     thread_shttl_dict_upd.start()
 
+    watchdog_thread = threading.Thread(target=watchdog)
+    watchdog_thread.daemon = True
+    watchdog_thread.start()
+
     # print(BOOK_QUEUE)
-
-
 startup()
 
 if DEBUG:
