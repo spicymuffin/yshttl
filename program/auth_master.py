@@ -2,21 +2,18 @@ import requests
 import rsa
 import json
 
-# https://underwood1.yonsei.ac.kr/passni/spLogin.jsp?returnUrl=L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl&locale={locale}
-
-S1_pad = len('S1"         value="')
-S1_len = len('34175A69027670C2C2B2ED852C9E1E2BD357330DE5A3D487CC24BC7324F8446B1FC345098B59C7FA28BB41737D7E5A545BA85F7B7116C9148E74EA7D515587FBECA9653CB01D8F985C7BE7052E004505AA3DA0EC4822C5BE3E348640C138612A0BBCDA1FA0532F06AD0F3D0BEC3B8CF61AFE9F6F340A606021C503323FD553EDA561838AA63D92827897AB91B4FF380C41B3E1DA45B2AC55740C9757F398575FC08634B168B580B2A6B906090AE5D007DD7F2A062B63FBCFED0A10F3D103B4B2C9E07255D2659B63E3E624F37986E902A02720AAF914BD027A6D437A0017A6EF2F052470888FC59DE716D61105F8DD92F35EAEDFD682F189735C04356829BE50')
+# region names
 JSESSIONID_cookie_name = "JSESSIONID"
 __smVisitorID_cookie_name = "__smVisitorID"
 WMONID_cookie_name = "WMONID"
-ssoChallenge_pad = len("var ssoChallenge= '")
-PRINT_DISSECT_VALS = False
+# endregion
 
+# delete before release pls
 userid = "**replaced USERID using filter-repo**"
 userpw = "**replaced PW using filter-repo**"
 
 
-def get_auth_cookies(_userid, _userpw):
+def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS = False):
     """ get authenticated cookies from underwood1.yonsei.ac.kr
 
     Args:
@@ -64,6 +61,10 @@ def get_auth_cookies(_userid, _userpw):
         while (s[index] != ';'):
             JSESSIONID_main += s[index]
             index += 1
+
+        if PRINT_DISSECT_VALS:
+            print("WMONID:", WMONID, '\n')
+            print("JSESSIONID_main:", JSESSIONID_main, '\n')
         # endregion
 
         # region SSOLegacy_do_prelogin_r
@@ -107,12 +108,16 @@ def get_auth_cookies(_userid, _userpw):
 
         # region dissect SSOLegacy_do_prelogin_r
         SSOLegacydo_prelogin_request_content = SSOLegacy_do_prelogin_r_response.content.decode()
-        index = SSOLegacydo_prelogin_request_content.rfind("S1") + S1_pad
-        S1_prelogin = SSOLegacydo_prelogin_request_content[index:index + S1_len]
+        scan_i = SSOLegacydo_prelogin_request_content.rfind('"S1"         value="') + len('"S1"         value="')
+        S1_prelogin = ""
+        while SSOLegacydo_prelogin_request_content[scan_i] != '"':
+            S1_prelogin += SSOLegacydo_prelogin_request_content[scan_i]
+            scan_i += 1
+        if PRINT_DISSECT_VALS:
+            print("S1_prelogin:", S1_prelogin, '\n')
         # endregion
 
         # region PmSSOService_r
-        # empty
         PmSSOService_r_cookies = {
             # 'JSESSIONID': 'q5lugktEqcBZ5VA3BugT3VyFU1PRipTz7vL7DpGVVEH9tzVaxRneiIjDB595OwJk.amV1c19kb21haW4vc3NvMV8x',
             # '__smVisitorID': 'sZfp4kyKHmx',
@@ -168,13 +173,17 @@ def get_auth_cookies(_userid, _userpw):
         JSESSIONID_temp = ""
         index = s.find(JSESSIONID_cookie_name) + \
             len(JSESSIONID_cookie_name) + 1  # this is a mess sorry
-        while (s[index] != ';'):
+        while s[index] != ';':
             JSESSIONID_temp += s[index]
             index += 1
 
+        # if an error occurs
         PmSSOService_r_response_content = PmSSOService_r_response.content.decode()
         if PmSSOService_r_response_content.find("연동대상시스템의 정상적인 요청이 아닙니다") != -1:
+            if NOTIFY_ERRORS:
+                print("연동대상시스템의 정상적인 요청이 아닙니다 error occured while authenticating")
             return get_auth_cookies(_userid, _userpw)
+
         scan_i = PmSSOService_r_response_content.rfind(
             "rsa.setPublic")
 
@@ -198,11 +207,17 @@ def get_auth_cookies(_userid, _userpw):
             scan_i += 1
 
         ssoChallenge_start_index = PmSSOService_r_response_content.find(
-            "var ssoChallenge= '") + ssoChallenge_pad
+            "var ssoChallenge= '") + len("var ssoChallenge= '")
         ssoChallenge = ""
         while PmSSOService_r_response_content[ssoChallenge_start_index] != "'":
             ssoChallenge += PmSSOService_r_response_content[ssoChallenge_start_index]
             ssoChallenge_start_index += 1
+        if PRINT_DISSECT_VALS:
+            print("__smVisitorID_main:", __smVisitorID_main, '\n')
+            print("JSESSIONID_temp:", JSESSIONID_temp, '\n')
+            print("RSAPublicKey1:", RSAPublicKey1, '\n')
+            print("RSAPublicKey2:", RSAPublicKey2, '\n')
+            print("ssoChallenge:", ssoChallenge, '\n')
         # endregion
 
         # region authentication
@@ -304,11 +319,12 @@ def get_auth_cookies(_userid, _userpw):
         while PmSSOAuthService_r_response_content[scan_i] != '"':
             CLTID += PmSSOAuthService_r_response_content[scan_i]
             scan_i += 1
+
         if PRINT_DISSECT_VALS:
-            print(E3)
-            print(E4)
-            print(S2)
-            print(CLTID)
+            print("E3:", E3, '\n')
+            print("E4:", E4, '\n')
+            print("S2:", S2, '\n')
+            print("CLTID:", CLTID, '\n')
         # endregion
 
         # region SSOLegacy_do_pname_spLogin_r
