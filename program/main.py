@@ -314,7 +314,10 @@ def check_book_queue(_now):
     date: {rt.departure_datetime.date()}
     time: {rt.departure_datetime.time()}""")
             BOOK_QUEUE.pop(0)
-        rt = BOOK_QUEUE[0]
+        if len(BOOK_QUEUE) > 0:
+            rt = BOOK_QUEUE[0]
+        else:
+            break
 
 
 def insert_route_BOOK_QUEUE(_route):
