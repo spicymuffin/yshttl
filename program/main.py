@@ -639,8 +639,6 @@ def startup():
     with open(CONFIG_FILE_PATH, 'r') as file:
         SCHEDULE = json.load(file)
 
-    # print(SCHEDULE)
-
     if os.path.exists(COOKIE_JAR_FILE_PATH):
         with open(COOKIE_JAR_FILE_PATH, 'r') as file:
             WMONID = file.readline()[:-1]
