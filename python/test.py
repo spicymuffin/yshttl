@@ -122,5 +122,20 @@
 
 # print("This is the message that will be deleted.", end="\r")
 
-import datetime
-print(datetime.datetime(2023, 2, 4, 9, 0, 0) + datetime.timedelta(days=100))
+# import datetime
+# print(datetime.datetime(2023, 2, 4, 9, 0, 0) + datetime.timedelta(days=100))
+
+#!/usr/bin/python
+
+import time
+import subprocess
+import sys
+import msvcrt
+
+alarm1 = int(input("How many seconds (alarm1)? "))
+
+while (1):
+    time.sleep(alarm1)
+    print("Alarm1")
+    sys.stdout.flush()
+

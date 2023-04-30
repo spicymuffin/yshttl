@@ -12,7 +12,6 @@ import json
 from rich.console import Console
 import rich
 from rich import print as rprint
-from pprint import pprint
 
 # region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -26,14 +25,30 @@ USERID = "**replaced USERID using filter-repo**"
 USERPW = "**replaced PW using filter-repo**"
 WMONID = ""
 JSESSIONID = ""
-CLOCK_REFRESH_RATE = 1/4  # in seconds
-BOOK_TIME = datetime.time(13, 55, 0)
+REFRESH_RATE_CLOCK = 1/4  # in seconds
+REFRESH_RATE_SHTTL_LST = 10
+
+BOOK_TIME = datetime.time(0, 2, 0)
+DAYS_FROM_START = 7
+START_DAY = None
+LAST_AUTH_TIME = datetime.datetime(1999, 1, 1, 0, 0, 0)
+AUTH_SESSION = 60 * 5
+
 
 CONSOLE = None
 SCHEDULE = None
 
 
+SHTTL_LST = []
+
+thread_clock_upd = None
+
+BOOK_QUEUE_SCDL = []
+BOOK_QUEUE_USER = []
+
 # region utility functions
+
+
 def datetime_to_str_date(_datetime):
     """parse out date from datetime object and format it to yyyymmdd
 
@@ -65,17 +80,27 @@ def cprint(msg, main=True):
     s = str(msg)
     s = s.replace('\n', '\n    ')
     if main:
-        print(">>> " + s)
+        CONSOLE.print("[bold red]>>> [/]" + s)
     else:
-        print("\n>>> " + s, flush=True)
-        print("<<< ", end="", flush=True)
+        CONSOLE.print("[bold red]\n>>> [/]" + s)
+        CONSOLE.print("[bold green]<<< [/]", end="")
+
+def clog(msg, main=True):
+    s = str(msg)
+    if main:
+        CONSOLE.log(s)
+    else:
+        CONSOLE.print()
+        CONSOLE.log(s)
+        CONSOLE.print("[bold green]<<< [/]", end="")
 
 
 def cinput(indent=False):
+    global CONSOLE
     if not indent:
-        return input("<<< ")
+        return CONSOLE.input("[bold green]<<< [/]")
     else:
-        return input("    <<< ")
+        return CONSOLE.input("[bold green]    <<< [/]")
 # endregion
 
 # region classes
@@ -140,19 +165,40 @@ class Route:
 
 
 def check_auth_and_exec(func, args):
-    if not server_interface.check_login():
-        cookies = auth_master.get_auth_cookies(USERID, USERPW)
-        if isinstance(cookies, Exception):
-            cprint(f"failed to authenticate: {cookies}")
-            return check_auth_and_exec(func, args)
-        with open(COOKIE_JAR_FILE_PATH, 'w') as file:
-            file.write(cookies[0] + '\n' + cookies[1])
-        WMONID = cookies[0]
-        JSESSIONID = cookies[1]
-        server_interface.WMONID = WMONID
-        server_interface.JSESSIONID = JSESSIONID
+    global LAST_AUTH_TIME
+    global NOW
+    if (NOW - LAST_AUTH_TIME).seconds > AUTH_SESSION:
+        if not server_interface.check_login():
+            cookies = auth_master.get_auth_cookies(USERID, USERPW)
+            if isinstance(cookies, Exception):
+                cprint(f"failed to authenticate: {cookies}")
+                return check_auth_and_exec(func, args)
+            with open(COOKIE_JAR_FILE_PATH, 'w') as file:
+                file.write(cookies[0] + '\n' + cookies[1])
+            WMONID, JSESSIONID = cookies
+            server_interface.WMONID = WMONID
+            server_interface.JSESSIONID = JSESSIONID
+            clog("re-authenticated", False)
 
     return func(*args)
+
+
+def check_auth_reauth():
+    global LAST_AUTH_TIME
+    global NOW
+    if (NOW - LAST_AUTH_TIME).seconds > AUTH_SESSION:
+        if not server_interface.check_login():
+            cookies = auth_master.get_auth_cookies(USERID, USERPW)
+            if isinstance(cookies, Exception):
+                cprint(f"failed to authenticate on startup: {cookies}")
+                return
+            with open(COOKIE_JAR_FILE_PATH, 'w') as file:
+                file.write(cookies[0] + '\n' + cookies[1])
+            WMONID = cookies[0]
+            JSESSIONID = cookies[1]
+            server_interface.WMONID = WMONID
+            server_interface.JSESSIONID = JSESSIONID
+            clog("re-authenticated", False)
 
 
 def get_shttl_map(_date):
@@ -197,34 +243,7 @@ def get_shttl_map_n_days(_now, n=3):
 
     return maps
 
-
-def clock_upd():
-    try:
-        global NOW
-        global DAYS_FROM_START
-        currd = NOW.day
-        while True:
-            time.sleep(CLOCK_REFRESH_RATE)
-            NOW = datetime.datetime.now()
-
-            # force update when 1:55pm happens bc we want to be sneaky and close to 2 pm
-            if not flag and NOW.hour >= BOOK_TIME.hour \
-                    and NOW.minute >= BOOK_TIME.minute \
-                    and NOW.second >= BOOK_TIME.second:
-                rprint("BOOK_TIME")
-                # # update next three days
-                # check_auth_and_exec(update_n3d, (NOW, ))
-                # # check book_queue
-                # check_auth_and_exec(check_book_queue, (NOW, ))
-                # cprint("forced usl, checked bookings", main=False)
-                flag = True
-            if currd < NOW.day:
-                flag = False
-                currd = NOW.day
-                book_schedule_from_sd(DAYS_FROM_START)
-                DAYS_FROM_START += 1
-    except Exception as ex:
-        cprint(f"CRASH! clock_upd_thread dead: {ex}", main=False)
+# region pretty output
 
 
 def gen_shttl_map_table(_shttl_map):
@@ -257,11 +276,93 @@ def gen_shttl_map_panels(_shttl_map):
             f"[b]#{i}[/b][yellow] {str(_shttl_map['I'][i].departure_datetime.time())}", expand=True, subtitle_align="right"))
 
     return (Columns(S), Columns(I))
+# endregion
+
+
+def insert_route_BOOK_QUEUE_SCDL(_route):
+    global BOOK_QUEUE_SCDL
+    inserted = False
+    for i in range(len(BOOK_QUEUE_SCDL)):
+        if BOOK_QUEUE_SCDL[i].departure_datetime >= _route.departure_datetime:
+            BOOK_QUEUE_SCDL.insert(i, _route)
+            inserted = True
+            return
+    if inserted == False:
+        BOOK_QUEUE_SCDL.append(_route)
+
+
+def insert_schedule_bookings(delta):
+    global START_DAY
+    d = START_DAY + datetime.timedelta(days=delta)
+    dow_i = d.weekday()
+    rts = SCHEDULE[str(dow_i)]
+    for j in rts:
+        splt = j["time"].split(":")
+        hours = int(splt[0])
+        minutes = int(splt[1])
+        rdt = datetime.datetime(d.year, d.month, d.day, hours, minutes)
+        if rdt - datetime.timedelta(seconds=5) > NOW:
+            rt = WishlistRoute(j["origin"], rdt)
+            insert_route_BOOK_QUEUE_SCDL(rt)
+
+
+def update_SHTTL_LST(_now):
+    global SHTTL_LST
+    SHTTL_LST = get_shttl_map_n_days(_now, 3)
+
+
+def clock_upd():
+    global NOW
+    global SHTTL_LST
+    global CONSOLE
+    global DAYS_FROM_START
+
+    currd = NOW.day
+    last_map_update = NOW
+    flag = False
+
+    while True:
+        time.sleep(REFRESH_RATE_CLOCK)
+        NOW = datetime.datetime.now()
+        t_from_last_map_update = NOW - last_map_update
+
+        # every REFRESH_RATE_SHTTL_LST seconds update SHTTL_LST
+        if t_from_last_map_update.seconds > REFRESH_RATE_SHTTL_LST:
+            update_SHTTL_LST(NOW)
+            last_map_update = NOW
+
+        # execute schedule bookings when BOOK_TIME is surpassed
+        if not flag and NOW.hour >= BOOK_TIME.hour \
+                and NOW.minute >= BOOK_TIME.minute \
+                and NOW.second >= BOOK_TIME.second:
+            try:
+                clog("inserting scheduled bookings", False)
+                # update next three days
+                check_auth_and_exec(update_SHTTL_LST, (NOW, ))
+                # check BOOK_QUEUE_SCDL
+                check_auth_and_exec(check_book_queue, (NOW, ))
+            except Exception as ex:
+                clog(f"error occured while inserting scheduled bookings: {ex}", False)
+            flag = True
+        if currd < NOW.day:
+            flag = False
+            currd = NOW.day
+
+            # insert schedule booings
+            insert_schedule_bookings(DAYS_FROM_START)
+
+            # update days from start
+            DAYS_FROM_START += 1
 
 
 def startup():
     global CONSOLE
     global SCHEDULE
+    global thread_clock_upd
+    global NOW
+    global SHTTL_LST
+    global START_DAY
+    global LAST_AUTH_TIME
 
     # region load cookies and config
     with open(CONFIG_FILE_PATH, 'r') as file:
@@ -277,27 +378,31 @@ def startup():
     # endregion
 
     # check cookie validity
-    if not server_interface.check_login():
-        cookies = auth_master.get_auth_cookies(USERID, USERPW)
-        if isinstance(cookies, Exception):
-            cprint(f"failed to authenticate on startup: {cookies}")
-            return
-        with open(COOKIE_JAR_FILE_PATH, 'w') as file:
-            file.write(cookies[0] + '\n' + cookies[1])
-        WMONID = cookies[0]
-        JSESSIONID = cookies[1]
-        server_interface.WMONID = WMONID
-        server_interface.JSESSIONID = JSESSIONID
 
     # init console
     CONSOLE = Console()
     CONSOLE.print("Hello", "World!", style="bold red")
 
-    maps = get_shttl_map_n_days(datetime.datetime.now(), 4)
-    CONSOLE.print(maps)
+    # set dates, times
+    NOW = datetime.datetime.now()
+    START_DAY = NOW.date()
 
-    t = gen_shttl_map_table(maps[1])
-    CONSOLE.print(t)
+    # startup SHTTL_LST
+    update_SHTTL_LST(NOW)
+
+    # book 7 days ahead
+    for i in range(DAYS_FROM_START):
+        insert_schedule_bookings(i)
+
+    # start clock thread
+    thread_clock_upd = threading.Thread(target=clock_upd)
+    thread_clock_upd.daemon = True
+    thread_clock_upd.start()
 
 
 startup()
+
+
+while True:
+    # with CONSOLE.status("updating lock....", spinner="clock"):
+        cprint(cinput())
