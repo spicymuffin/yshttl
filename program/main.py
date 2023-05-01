@@ -524,7 +524,6 @@ def tr_wrapper(func, args):
 
 
 def console_handler():
-    global CMD_QUEUE
     while True:
         inp = cinput()
         inp_parsed = inp.split(" ")

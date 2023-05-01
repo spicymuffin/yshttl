@@ -21,12 +21,17 @@ COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
 COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
 # endregion
 
+# region credentials
 USERID = "**replaced USERID using filter-repo**"
 USERPW = "**replaced PW using filter-repo**"
 WMONID = ""
 JSESSIONID = ""
+# endregion
+
+# region refresh rates
 REFRESH_RATE_CLOCK = 1/4  # in seconds
 REFRESH_RATE_SHTTL_LST = 10
+# endregion
 
 BOOK_TIME = datetime.time(0, 2, 0)
 DAYS_FROM_START = 7
@@ -38,7 +43,6 @@ AUTH_SESSION = 60 * 5
 CONSOLE = None
 SCHEDULE = None
 
-
 SHTTL_LST = []
 
 thread_clock_upd = None
@@ -46,9 +50,8 @@ thread_clock_upd = None
 BOOK_QUEUE_SCDL = []
 BOOK_QUEUE_USER = []
 
+
 # region utility functions
-
-
 def datetime_to_str_date(_datetime):
     """parse out date from datetime object and format it to yyyymmdd
 
@@ -73,9 +76,8 @@ def datetime_to_str_time(_datetime):
     return format(_datetime.hour, "0>2") + format(_datetime.minute, "0>2")
 # endregion
 
+
 # region console i/o
-
-
 def cprint(msg, main=True):
     s = str(msg)
     s = s.replace('\n', '\n    ')
@@ -84,6 +86,7 @@ def cprint(msg, main=True):
     else:
         CONSOLE.print("[bold red]\n>>> [/]" + s)
         CONSOLE.print("[bold green]<<< [/]", end="")
+
 
 def clog(msg, main=True):
     s = str(msg)
@@ -103,9 +106,8 @@ def cinput(indent=False):
         return CONSOLE.input("[bold green]    <<< [/]")
 # endregion
 
+
 # region classes
-
-
 class WishlistRoute:
     """represent wishlisted routes
     """
@@ -160,10 +162,10 @@ class Route:
             return f"""date: {self.departure_datetime.date()} time: {self.departure_datetime.time()} origin: {self.origin} remdSt: {self.seats_available}"""
         else:
             return str(self.departure_datetime.time())
-
 # endregion classes
 
 
+# region auth
 def check_auth_and_exec(func, args):
     global LAST_AUTH_TIME
     global NOW
@@ -199,8 +201,10 @@ def check_auth_reauth():
             server_interface.WMONID = WMONID
             server_interface.JSESSIONID = JSESSIONID
             clog("re-authenticated", False)
+# endregion
 
 
+# region shttl_map_management
 def get_shttl_map(_date):
     """get shttl map on date _date
 
@@ -242,6 +246,8 @@ def get_shttl_map_n_days(_now, n=3):
         maps.append(get_shttl_map(days[i]))
 
     return maps
+# endregion
+
 
 # region pretty output
 
@@ -289,6 +295,18 @@ def insert_route_BOOK_QUEUE_SCDL(_route):
             return
     if inserted == False:
         BOOK_QUEUE_SCDL.append(_route)
+
+
+def insert_route_BOOK_QUEUE_USER(_route):
+    global BOOK_QUEUE_USER
+    inserted = False
+    for i in range(len(BOOK_QUEUE_USER)):
+        if BOOK_QUEUE_USER[i].departure_datetime >= _route.departure_datetime:
+            BOOK_QUEUE_USER.insert(i, _route)
+            inserted = True
+            return
+    if inserted == False:
+        BOOK_QUEUE_USER.append(_route)
 
 
 def insert_schedule_bookings(delta):
@@ -342,7 +360,8 @@ def clock_upd():
                 # check BOOK_QUEUE_SCDL
                 check_auth_and_exec(check_book_queue, (NOW, ))
             except Exception as ex:
-                clog(f"error occured while inserting scheduled bookings: {ex}", False)
+                clog(
+                    f"error occured while inserting scheduled bookings: {ex}", False)
             flag = True
         if currd < NOW.day:
             flag = False
@@ -405,4 +424,4 @@ startup()
 
 while True:
     # with CONSOLE.status("updating lock....", spinner="clock"):
-        cprint(cinput())
+    cprint(cinput())
