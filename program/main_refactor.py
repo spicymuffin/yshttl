@@ -44,14 +44,18 @@ CONSOLE = None
 SCHEDULE = None
 
 SHTTL_LST = []
+SHTTL_MPS = []
 
 thread_clock_upd = None
 
 BOOK_QUEUE_SCDL = []
 BOOK_QUEUE_USER = []
 
+UPDATING_LOCK = False
 
 # region utility functions
+
+
 def datetime_to_str_date(_datetime):
     """parse out date from datetime object and format it to yyyymmdd
 
@@ -112,11 +116,12 @@ class WishlistRoute:
     """represent wishlisted routes
     """
 
-    def __init__(self, _origin="S", _departure_datetime=datetime.datetime.now()) -> None:
+    def __init__(self, _origin="S", _departure_datetime=datetime.datetime.now(), _mode="r") -> None:
         self.origin = _origin
         self.departure_datetime = _departure_datetime
         self.str_departure_date = datetime_to_str_date(_departure_datetime)
         self.str_departure_time = datetime_to_str_time(_departure_datetime)
+        self.mode = _mode
 
     def __repr__(self):
         return str(self)
@@ -212,7 +217,7 @@ def get_shttl_map(_date):
         _date (str): date in yyyymmdd format
 
     Returns:
-        int: -1 on failure, 0 on success
+        dict: shttl_map
     """
     global WMONID
     global JSESSIONID
@@ -225,6 +230,7 @@ def get_shttl_map(_date):
     for i in range(len(temp_lst_S)):
         rt = Route()
         rt.import_dictionary(temp_lst_S[i])
+        # rprint(rt.dct)#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         shttl_map['S'].append(rt)
 
     for i in range(len(temp_lst_I)):
@@ -320,8 +326,8 @@ def insert_schedule_bookings(delta):
         minutes = int(splt[1])
         rdt = datetime.datetime(d.year, d.month, d.day, hours, minutes)
         if rdt - datetime.timedelta(seconds=5) > NOW:
-            rt = WishlistRoute(j["origin"], rdt)
-            insert_route_BOOK_QUEUE_SCDL(rt)
+            wrt = WishlistRoute(j["origin"], rdt, j["mode"])
+            insert_route_BOOK_QUEUE_SCDL(wrt)
 
 
 def update_SHTTL_LST(_now):
@@ -329,9 +335,82 @@ def update_SHTTL_LST(_now):
     SHTTL_LST = get_shttl_map_n_days(_now, 3)
 
 
+def book_available(_book_queue, _now, n=3):
+    global UPDATING_LOCK
+    global SHTTL_MPS
+
+    if len(_book_queue) == 0:
+        return
+
+    while _book_queue[0].departure_datetime + datetime.timedelta(seconds=5) < NOW:
+        _book_queue.pop(0)
+        clog("removed expired book request", False)
+
+    while UPDATING_LOCK:
+        pass
+
+    days = []
+    for i in range(n):
+        d = _now + datetime.timedelta(days=i)
+        days.append(datetime_to_str_date(d))
+
+    lst = days
+
+    rt = _book_queue[0]
+
+    while rt.str_departure_date in lst:
+        shttl_map = None
+        for i in range(len(SHTTL_MPS)):
+            if SHTTL_MPS[i]["date"] == rt.str_departure_date:
+                shttl_map = SHTTL_MPS[i][rt.origin]
+                break
+
+        min_diff = 24*60*60  # max minutes in a day
+        min_diff_index = None
+        found = False
+
+        for i in range(len(shttl_map)):
+            if rt.mode == 'r':  # switch timestamp places so we find min dst before or after
+                diff = shttl_map[i].departure_datetime.timestamp() - \
+                    rt.departure_datetime.timestamp()
+            else:
+                diff = rt.departure_datetime.timestamp() -  \
+                    shttl_map[i].departure_datetime.timestamp()
+
+            if min_diff > diff and shttl_map[i].seats_available > 0 and diff >= 0:
+                min_diff_index = i
+                min_diff = diff
+                found = True
+
+        if found:
+            # shttl_map[min_diff_index].book() #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if rt.mode == "l":
+                cprint(f"""successfully booked shttl before (L) {rt.departure_datetime.time()}:
+  origin: {shttl_map[min_diff_index].origin}
+    date: {shttl_map[min_diff_index].departure_datetime.date()}
+    time: {shttl_map[min_diff_index].departure_datetime.time()}""", False)
+            else:
+                cprint(f"""successfully booked shttl after (R) {rt.departure_datetime.time()}:
+  origin: {shttl_map[min_diff_index].origin}
+    date: {shttl_map[min_diff_index].departure_datetime.date()}
+    time: {shttl_map[min_diff_index].departure_datetime.time()}""", False)
+            _book_queue.pop(0)
+        else:
+            cprint(f"""failed to book shttl:
+  origin: {rt.origin}
+    date: {rt.departure_datetime.date()}
+    time: {rt.departure_datetime.time()}""", False)
+            _book_queue.pop(0)
+        if len(_book_queue) > 0:
+            rt = _book_queue[0]
+        else:
+            break
+
+
 def clock_upd():
     global NOW
     global SHTTL_LST
+    global SHTTL_MPS
     global CONSOLE
     global DAYS_FROM_START
 
@@ -353,23 +432,26 @@ def clock_upd():
         if not flag and NOW.hour >= BOOK_TIME.hour \
                 and NOW.minute >= BOOK_TIME.minute \
                 and NOW.second >= BOOK_TIME.second:
-            try:
-                clog("inserting scheduled bookings", False)
-                # update next three days
-                check_auth_and_exec(update_SHTTL_LST, (NOW, ))
-                # check BOOK_QUEUE_SCDL
-                check_auth_and_exec(check_book_queue, (NOW, ))
-            except Exception as ex:
-                clog(
-                    f"error occured while inserting scheduled bookings: {ex}", False)
+            # try:
+            # update next three days
+            clog("updating SHTTL_LST", False)
+            check_auth_and_exec(update_SHTTL_LST, (NOW, ))
+            # book available routes
+            clog("booking available routes in BOOK_QUEUE_SCDL", False)
+            check_auth_and_exec(book_available, (BOOK_QUEUE_SCDL, NOW, ))
+            # except Exception as ex:
+            #     clog(
+            #         f"error occured while inserting scheduled bookings: {ex}", False)
             flag = True
         if currd < NOW.day:
             flag = False
             currd = NOW.day
-
+            # get shuttle maps
+            clog("getting shuttle maps", False)
+            SHTTL_MPS = get_shttl_map_n_days(NOW, 3)
+            clog("inserting scheduled bookings", False)
             # insert schedule booings
             insert_schedule_bookings(DAYS_FROM_START)
-
             # update days from start
             DAYS_FROM_START += 1
 
@@ -380,6 +462,7 @@ def startup():
     global thread_clock_upd
     global NOW
     global SHTTL_LST
+    global SHTTL_MPS
     global START_DAY
     global LAST_AUTH_TIME
 
@@ -408,6 +491,8 @@ def startup():
 
     # startup SHTTL_LST
     update_SHTTL_LST(NOW)
+    # startup SHTTL_MPS
+    SHTTL_MPS = get_shttl_map_n_days(NOW)
 
     # book 7 days ahead
     for i in range(DAYS_FROM_START):
