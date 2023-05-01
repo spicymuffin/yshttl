@@ -53,9 +53,8 @@ BOOK_QUEUE_USER = []
 
 UPDATING_LOCK = False
 
+
 # region utility functions
-
-
 def datetime_to_str_date(_datetime):
     """parse out date from datetime object and format it to yyyymmdd
 
@@ -259,6 +258,14 @@ def get_shttl_map_n_days(_now, n=3):
 
 
 def gen_shttl_map_table(_shttl_map):
+    """get shttl map table
+
+    Args:
+        _shttl_map (dict): shttl map
+
+    Returns:
+        table: table
+    """
     table = Table(title=_shttl_map['date'])
 
     table.add_column("R. No.", style="cyan", no_wrap=True)
@@ -277,6 +284,14 @@ def gen_shttl_map_table(_shttl_map):
 
 
 def gen_shttl_map_panels(_shttl_map):
+    """gen shttl map panels
+
+    Args:
+        _shttl_map (dict): shttl map
+
+    Returns:
+        tuple: a tuple containing two column objects
+    """
     S = []
     I = []
     for i in range(len(_shttl_map['S'])):
@@ -336,6 +351,7 @@ def update_SHTTL_LST(_now):
 
 
 def book_available(_book_queue, _now, n=3):
+
     global UPDATING_LOCK
     global SHTTL_MPS
 
@@ -456,6 +472,176 @@ def clock_upd():
             DAYS_FROM_START += 1
 
 
+# region commands
+# region getcookies cmd
+def getcookies_handler(args):
+    check_auth_reauth()
+# endregion
+
+
+# region debug
+def debug_handler(args):
+    pass
+    global WMONID
+    global JSESSIONID
+    WMONID = "ASD"
+    JSESSIONID = "ASD"
+    server_interface.WMONID = WMONID
+    server_interface.JSESSIONID = JSESSIONID
+
+    # check_auth_and_exec(check_book_queue, (NOW,))
+# endregion
+
+
+# region book cmd
+def book_handler(args):
+    global NOW
+    args_processed = book_argument_parser(args)
+    if type(args_processed) == str:
+        cprint(f"request couldnt be fullfilled: {args_processed}")
+    else:
+        r = WishlistRoute(args_processed[0], args_processed[1])
+        insert_route_BOOK_QUEUE_USER(r)
+        cprint(f"route was added to wishlist successfully")
+        check_auth_and_exec(book_available(), (NOW, ))
+
+
+def book_argument_parser(args):
+    try:
+        today_date = datetime.date.today()
+        year = -1
+        month = -1
+        day = -1
+        hour = -1
+        minute = -1
+        origin = "xx"
+
+        # parse args sinchon songdo
+        if args[1] == "I" or "S":
+            origin = args[1]
+        else:
+            return "DestinationArgFormatError"
+
+        try:
+            if len(args[2]) == 4:
+                month = args[2][0:2]
+                day = args[2][2:4]
+                if today_date.month < month:
+                    year = today_date.year + 1
+                else:
+                    year = today_date.year
+
+            elif len(args[2]) == 8:
+                year = int(args[2][0:4])
+                month = args[2][4:6]
+                day = args[2][6:8]
+            else:
+                return "DateArgFormatError"
+        except:
+            return "DateArgFormatError"
+
+        try:
+            splt = args[3].split(":")
+            hour = splt[0]
+            minute = splt[1]
+        except:
+            return "TimeArgFormatError"
+
+        try:
+            date_time = datetime.datetime(int(year), int(
+                month), int(day), int(hour), int(minute))
+            if date_time < datetime.datetime.now():
+                return "InvalidTimeError: DateTime has passed"
+            else:
+                return [origin, date_time]
+        except Exception as ex:
+            return f"InvalidTimeError: DateTime invaild {ex}"
+
+    except Exception as ex:
+        clog(f"request couldnt be fullfilled: {ex}")
+# endregion
+
+
+# region quit cmd
+def quit_handler(args):
+    cprint("quit? (type 'y' to confirm)")
+    r = cinput(1)
+    if r == 'y':
+        quit(0)
+# endregion
+
+
+# region updshttllist cmd
+def updshttllist_handler(args):
+    pass
+# endregion
+
+
+# region bookqueue cmd
+def bookqueue_handler(args):
+    pass
+# endregion
+
+
+# region shttldict cmd
+def shttldict_handler(args):
+    pass
+# endregion
+
+
+# region clear cmd
+def clear_handler(args):
+    os.system('cls')
+# endregion
+# endregion
+
+
+a**replaced ALIAS using filter-repo**s_book = ["book"]
+a**replaced ALIAS using filter-repo**s_quit_handler = ["quit"]
+a**replaced ALIAS using filter-repo**s_getcookies_handler = ["getcookies", "gc"]
+a**replaced ALIAS using filter-repo**s_updshttllist = ["updshttllist", "updateshuttlelist", "usl"]
+a**replaced ALIAS using filter-repo**s_bookqueue = ["bookqueue", "bq"]
+a**replaced ALIAS using filter-repo**s_shttldict = ["shttldict", "sd"]
+a**replaced ALIAS using filter-repo**s_clear = ["clear"]
+a**replaced ALIAS using filter-repo**s_debug = ["db", "debug"]
+
+
+def tr_wrapper(func, args):
+    if func == book_handler or func == shttldict_handler:
+        with CONSOLE.status("updating lock....", spinner="clock"):
+            while UPDATING_LOCK:
+                pass
+    func(args)
+
+
+def console_handler():
+    while True:
+        inp = cinput()
+        inp_parsed = inp.split(" ")
+        cmd = inp_parsed[0]
+        exec = None
+        if cmd in a**replaced ALIAS using filter-repo**s_book:
+            exec = (book_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_quit_handler:
+            exec = (quit_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_getcookies_handler:
+            exec = (getcookies_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_updshttllist:
+            exec = (updshttllist_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_bookqueue:
+            exec = (bookqueue_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_shttldict:
+            exec = (shttldict_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_clear:
+            exec = (clear_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_debug:
+            exec = (debug_handler, inp_parsed)
+        else:
+            cprint(f"{cmd} is not recognized as a command")
+        if exec != None:
+            tr_wrapper(exec[0], exec[1],)
+
+
 def startup():
     global CONSOLE
     global SCHEDULE
@@ -482,7 +668,7 @@ def startup():
     # check cookie validity
 
     # init console
-    CONSOLE = Console()
+    CONSOLE = Console(stderr=True, style="bold red")
     CONSOLE.print("Hello", "World!", style="bold red")
 
     # set dates, times
@@ -498,6 +684,9 @@ def startup():
     for i in range(DAYS_FROM_START):
         insert_schedule_bookings(i)
 
+    # start console
+    console_handler()
+
     # start clock thread
     thread_clock_upd = threading.Thread(target=clock_upd)
     thread_clock_upd.daemon = True
@@ -505,8 +694,3 @@ def startup():
 
 
 startup()
-
-
-while True:
-    # with CONSOLE.status("updating lock....", spinner="clock"):
-    cprint(cinput())

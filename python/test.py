@@ -127,15 +127,21 @@
 
 #!/usr/bin/python
 
-import time
-import subprocess
-import sys
-import msvcrt
+# import time
+# import subprocess
+# import sys
+# import msvcrt
 
-alarm1 = int(input("How many seconds (alarm1)? "))
+# alarm1 = int(input("How many seconds (alarm1)? "))
 
-while (1):
-    time.sleep(alarm1)
-    print("Alarm1")
-    sys.stdout.flush()
+# while (1):
+#     time.sleep(alarm1)
+#     print("Alarm1")
+#     sys.stdout.flush()
 
+from io import StringIO
+from rich.console import Console
+console = Console(file=StringIO())
+console.print("[bold red]Hello[/] World")
+str_output = console.file.getvalue()
+console.print(str_output)
