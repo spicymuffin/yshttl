@@ -21,7 +21,7 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
         _userpw (string): user password
 
     Returns:
-        tuple or string: WMONID and JSESSIONID if successful (tuple), else error message (string)
+        tuple or Exception: WMONID and JSESSIONID if successful (tuple), else exception (Exception)
     """
     try:
         # region spLogin_jsp_r
