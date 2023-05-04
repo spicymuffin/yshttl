@@ -527,7 +527,8 @@ def book_available(_book_queue, _now, main=False, n=3):
                 found = True
 
         if found:
-            shttl_map[min_diff_index].book() #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            shttl_map[min_diff_index].book()
             if rt.mode == "l":
                 cprint(f"""successfully booked shttl before (L) {rt.departure_datetime.time()}:
   origin: {shttl_map[min_diff_index].origin}
@@ -573,7 +574,7 @@ def clock_upd():
         # every REFRESH_RATE_SHTTL_LST seconds update SHTTL_LST
         if t_from_last_map_update.seconds > REFRESH_RATE_SHTTL_LST:
             UPDATING_LOCK = True
-            update_SHTTL_LST(NOW)
+            check_auth_and_exec(update_SHTTL_LST, (NOW, ))
             UPDATING_LOCK = False
             last_map_update = NOW
 
