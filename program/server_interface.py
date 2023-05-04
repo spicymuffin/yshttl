@@ -153,7 +153,6 @@ def request_shttl_list(_data_string):
 
 
 def parse_request_shttl_list(resp):
-    print(resp)
     index = 0
     while resp[index] != "[":
         index += 1
