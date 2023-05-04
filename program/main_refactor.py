@@ -784,12 +784,55 @@ def shttl_lst_handler(args):
         render(table)
 # endregion
 
+
 # region clear cmd
-
-
 def clear_handler(args):
     os.system('cls')
 # endregion
+
+
+def force_book_handler(args):
+    global NOW
+    global SHTTL_MPS
+    args_processed = force_book_argument_parser(args)
+    if type(args_processed) == str:
+        # show error message
+        cprint(f"request couldnt be fullfilled: {args_processed}")
+    else:
+        s = SHTTL_MPS[args_processed[0]][args_processed[2]][args_processed[1]]
+        s.book()
+
+
+def force_book_argument_parser(args):
+    try:
+        shttl_map_index = None
+        shttl_index = None
+        origin = None
+
+        try:
+            shttl_map_index = int(args[1])
+        except:
+            return "ShttlMapIndexArgError"
+
+        try:
+            shttl_index = int(args[2])
+        except:
+            return "ShttlIndexArgError"
+
+        if args[3] != "S" and args[3] != "I":
+            return "OriginArgError"
+        else:
+            origin = args[3]
+
+        if not (0 <= shttl_map_index < len(SHTTL_MPS)):
+            return "ShttlMapIndexValueError"
+
+        if not (0 <= shttl_index < len(SHTTL_MPS[shttl_map_index][origin])):
+            return "ShttlIndexValueError"
+
+        return [shttl_map_index, shttl_index, origin]
+    except Exception as ex:
+        cprint(f"request couldnt be fullfilled: {ex}")
 # endregion
 
 
@@ -802,6 +845,7 @@ a**replaced ALIAS using filter-repo**s_shttl_map = ["shttlmap", "sm", "shuttlema
 a**replaced ALIAS using filter-repo**s_clear = ["clear"]
 a**replaced ALIAS using filter-repo**s_debug = ["db", "debug"]
 a**replaced ALIAS using filter-repo**s_shttl_lst = ["shttllst", "sl", "shuttlelist"]
+a**replaced ALIAS using filter-repo**s_force_book = ["forcebook", "fb"]
 
 
 def tr_wrapper(func, args):
@@ -836,6 +880,8 @@ def console_handler():
             exec = (debug_handler, inp_parsed)
         elif cmd in a**replaced ALIAS using filter-repo**s_shttl_lst:
             exec = (shttl_lst_handler, inp_parsed)
+        elif cmd in a**replaced ALIAS using filter-repo**s_force_book:
+            exec = (force_book_handler, inp_parsed)
         else:
             cprint(f"{cmd} is not recognized as a command")
         if exec != None:
