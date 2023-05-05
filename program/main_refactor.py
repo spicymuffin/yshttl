@@ -529,8 +529,9 @@ def book_available(_book_queue, _now, main=False, n=3):
                 found = True
 
         if found:
-            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             r = shttl_map[min_diff_index].book()
+            del shttl_map[min_diff_index]
             cprint(r)
             if rt.mode == "l":
                 cprint(f"""successfully booked shttl before (L) {rt.departure_datetime.time()}:
@@ -788,6 +789,8 @@ def clear_handler(args):
 # endregion
 
 # region force_book cmd
+
+
 def force_book_handler(args):
     global NOW
     global SHTTL_MPS
@@ -835,6 +838,7 @@ def force_book_argument_parser(args):
 # endregion
 
 
+# region console handling
 a**replaced ALIAS using filter-repo**s_book = ["book"]
 a**replaced ALIAS using filter-repo**s_quit_handler = ["quit"]
 a**replaced ALIAS using filter-repo**s_getcookies_handler = ["getcookies", "gc"]
@@ -885,6 +889,7 @@ def console_handler():
             cprint(f"{cmd} is not recognized as a command")
         if exec != None:
             tr_wrapper(exec[0], exec[1],)
+# endregion
 
 
 def startup():
