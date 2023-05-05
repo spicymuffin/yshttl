@@ -79,7 +79,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
             'Content-Type': 'application/x-www-form-urlencoded',
-            # 'Cookie': 'WMONID=MNUPPiwsrHX; JSESSIONID=uUvCDlferxCKu1O2B6zhsxwbW7tHl6PA7mt6VUm0hbPYzCxFxJg0yJHP7y9FwHcA.amV1c19kb21haW4vaGFrc2ExXzE=',
             'Origin': 'https://underwood1.yonsei.ac.kr',
             'Referer': 'https://underwood1.yonsei.ac.kr/passni/spLogin.jsp',
             'Sec-Fetch-Dest': 'document',
@@ -119,8 +118,7 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
 
         # region PmSSOService_r
         PmSSOService_r_cookies = {
-            # 'JSESSIONID': 'q5lugktEqcBZ5VA3BugT3VyFU1PRipTz7vL7DpGVVEH9tzVaxRneiIjDB595OwJk.amV1c19kb21haW4vc3NvMV8x',
-            # '__smVisitorID': 'sZfp4kyKHmx',
+
         }
 
         PmSSOService_r_headers = {
@@ -129,7 +127,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
             'Content-Type': 'application/x-www-form-urlencoded',
-            # 'Cookie': 'JSESSIONID=q5lugktEqcBZ5VA3BugT3VyFU1PRipTz7vL7DpGVVEH9tzVaxRneiIjDB595OwJk.amV1c19kb21haW4vc3NvMV8x; __smVisitorID=sZfp4kyKHmx',
             'Origin': 'https://underwood1.yonsei.ac.kr',
             'Referer': 'https://underwood1.yonsei.ac.kr/',
             'Sec-Fetch-Dest': 'document',
@@ -249,7 +246,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
             'Content-Type': 'application/x-www-form-urlencoded',
-            # 'Cookie': 'JSESSIONID=8iPfqhQdVpHx0dIZFmgLO6JEhSralPAQ7ch6fzMVTrVEIa7hx26WqLnJ1ywAkYJX.amV1c19kb21haW4vc3NvMV8x; __smVisitorID=DL3PkJYss4I',
             'Origin': 'https://infra.yonsei.ac.kr',
             'Referer': 'https://infra.yonsei.ac.kr/sso/PmSSOService',
             'Sec-Fetch-Dest': 'document',
@@ -339,7 +335,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
             'Content-Type': 'application/x-www-form-urlencoded',
-            # 'Cookie': 'WMONID=DsBn5ycHBH4; JSESSIONID=Ad411AxBG8p7WaXvORdyIkD9dVj92QGhbWFXbi0Ag510L75OxvaQ2CWKIGA11Mql.amV1c19kb21haW4vaGFrc2EyXzE=',
             'Origin': 'https://infra.yonsei.ac.kr',
             'Referer': 'https://infra.yonsei.ac.kr/',
             'Sec-Fetch-Dest': 'document',
@@ -392,7 +387,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Accept-Language': 'en-US,en;q=0.9',
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
-            # 'Cookie': 'WMONID=DsBn5ycHBH4; JSESSIONID=Ad411AxBG8p7WaXvORdyIkD9dVj92QGhbWFXbi0Ag510L75OxvaQ2CWKIGA11Mql.amV1c19kb21haW4vaGFrc2EyXzE=',
             'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
         }
@@ -416,7 +410,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Accept-Language': 'en-US,en;q=0.9',
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
-            # 'Cookie': 'WMONID=DsBn5ycHBH4; JSESSIONID=Ad411AxBG8p7WaXvORdyIkD9dVj92QGhbWFXbi0Ag510L75OxvaQ2CWKIGA11Mql.amV1c19kb21haW4vaGFrc2EyXzE=',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'cross-site',
@@ -442,7 +435,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'en-US,en;q=0.9',
             'Connection': 'keep-alive',
-            # 'Cookie': 'WMONID=DsBn5ycHBH4; JSESSIONID=Ad411AxBG8p7WaXvORdyIkD9dVj92QGhbWFXbi0Ag510L75OxvaQ2CWKIGA11Mql.amV1c19kb21haW4vaGFrc2EyXzE=',
             'Referer': 'https://underwood1.yonsei.ac.kr/passni/spLoginProcess.jsp',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
@@ -471,7 +463,6 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'en-US,en;q=0.9',
             'Connection': 'keep-alive',
-            # 'Cookie': 'WMONID=QWIy-oFrIJ9; JSESSIONID=8SzkFn8HXK0pP8O1eZ5YH7GH0lXV8Xm9xH25AbXCRvJr2xnXxdDYPGTXxandFGh1.amV1c19kb21haW4vaGFrc2EyXzE=',
             'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/j_login_sso.do?locale={locale}',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',

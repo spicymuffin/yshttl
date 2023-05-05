@@ -1,16 +1,15 @@
-from rich.table import Table
-from rich.panel import Panel
-from rich.columns import Columns
-from urllib.request import urlopen
-import os
-import threading
-import time
-import datetime
-import auth_master
+# custom
+import table_gen
 import server_interface
+import auth_master
+# pip
+import threading
+import datetime
 import json
+import time
+import os
+# rich
 from rich.console import Console
-import rich
 from rich import print as rprint
 
 # region file management
@@ -313,113 +312,17 @@ def get_shttl_map_n_days(_now, n=3):
         maps.append(get_shttl_map(days[i]))
 
     return maps
+
+
+def update_SHTTL_LST(_now):
+    global SHTTL_LST
+    """update SHTTL_LST assuming that only the next three days are available
+    """
+    SHTTL_LST = get_shttl_map_n_days(_now, 3)
 # endregion
 
 
-# region pretty output
-def gen_shttl_lst_table(_shttl_lst):
-    table = Table(title="SHTTL_LST")
-    mxI = -1
-    mxS = -1
-    for i in range(len(_shttl_lst)):
-        table.add_column(f"{_shttl_lst[i]['date']} times")
-        table.add_column("origin")
-        table.add_column("# seats")
-        if mxI < len(_shttl_lst[i]['I']):
-            mxI = len(_shttl_lst[i]['I'])
-        if mxS < len(_shttl_lst[i]['S']):
-            mxS = len(_shttl_lst[i]['S'])
-
-    cprint(mxI, mxS)
-    for j in range(mxI):
-        clmn = []
-        for i in range(len(_shttl_lst)):
-            if len(_shttl_lst[i]['I']) > j:
-                clmn.append(
-                    str(_shttl_lst[i]['I'][j].departure_datetime.time()))
-                clmn.append('I')
-                clmn.append(str(_shttl_lst[i]['I'][j].seats_available))
-            else:
-                for i in range(3):
-                    clmn.append('-')
-        table.add_row(*clmn)
-
-    table.add_section()
-
-    for j in range(mxS):
-        clmn = []
-        for i in range(len(_shttl_lst)):
-            if len(_shttl_lst[i]['S']) > j:
-                clmn.append(
-                    str(_shttl_lst[i]['S'][j].departure_datetime.time()))
-                clmn.append('S')
-                clmn.append(str(_shttl_lst[i]['S'][j].seats_available))
-            else:
-                for i in range(3):
-                    clmn.append('-')
-        table.add_row(*clmn)
-    return table
-
-
-def gen_shttl_lst_table_on_date(_shttl_lst, _date):
-    for i in range(len(_shttl_lst)):
-        if _date in _shttl_lst[i].keys():
-            pass
-
-
-def gen_bookqueue_table(_book_queue):
-    pass
-
-
-def gen_shttl_map_table(_shttl_map):
-    """get shttl map table
-
-    Args:
-        _shttl_map (dict): shttl map
-
-    Returns:
-        table: table
-    """
-    table = Table(title=_shttl_map['date'])
-
-    table.add_column("R. No.", style="cyan", no_wrap=True)
-    table.add_column("Origin", style="green")
-    table.add_column("Time", style="magenta")
-
-    table.add_column("Origin", style="green")
-    table.add_column("Time", style="magenta")
-
-    for i in range(max(len(_shttl_map['S']), len(_shttl_map['I']))):
-        table.add_row(str(i),
-                      'Sinchon' if i < len(_shttl_map['S']) else '-', str(_shttl_map['S'][i].departure_datetime.time()) if i < len(
-            _shttl_map['S']) else '-', 'International' if i < len(_shttl_map['I']) else '-', str(_shttl_map['I'][i].departure_datetime.time()) if i < len(_shttl_map['I']) else '-')
-
-    return table
-
-
-def gen_shttl_map_panels(_shttl_map):
-    """gen shttl map panels
-
-    Args:
-        _shttl_map (dict): shttl map
-
-    Returns:
-        tuple: a tuple containing two column objects
-    """
-    S = []
-    I = []
-    for i in range(len(_shttl_map['S'])):
-        S.append(Panel(
-            f"[b]#{i}[/b][yellow] {str(_shttl_map['S'][i].departure_datetime.time())}", expand=True, title_align="right"))
-
-    for i in range(len(_shttl_map['S'])):
-        I.append(Panel(
-            f"[b]#{i}[/b][yellow] {str(_shttl_map['I'][i].departure_datetime.time())}", expand=True, subtitle_align="right"))
-
-    return (Columns(S), Columns(I))
-# endregion
-
-
+# region route insertion
 def insert_route_BOOK_QUEUE_SCDL(_route):
     """insert a schedule booking request into BOOK_QUEUE_SCDL (sorted)
 
@@ -472,15 +375,10 @@ def insert_schedule_bookings(delta):
         if rdt - datetime.timedelta(seconds=5) > NOW:
             wrt = WishlistRoute(j["origin"], rdt, j["mode"])
             insert_route_BOOK_QUEUE_SCDL(wrt)
+# endregion
 
 
-def update_SHTTL_LST(_now):
-    global SHTTL_LST
-    """update SHTTL_LST assuming that only the next three days are available
-    """
-    SHTTL_LST = get_shttl_map_n_days(_now, 3)
-
-
+# region booking funcs
 def book_available(_book_queue, _now, main=False, n=3):
     global UPDATING_LOCK
     global SHTTL_MPS
@@ -505,44 +403,44 @@ def book_available(_book_queue, _now, main=False, n=3):
     rt = _book_queue[0]
 
     while rt.str_departure_date in lst:
-        shttl_map = None
+        chosen_shttl_map = None
         for i in range(len(SHTTL_MPS)):
             if SHTTL_MPS[i]["date"] == rt.str_departure_date:
-                shttl_map = SHTTL_MPS[i][rt.origin]
+                chosen_shttl_map = SHTTL_MPS[i][rt.origin]
                 break
 
         min_diff = 24*60*60  # max minutes in a day
         min_diff_index = None
         found = False
 
-        for i in range(len(shttl_map)):
+        for i in range(len(chosen_shttl_map)):
             if rt.mode == 'r':  # switch timestamp places so we find min dst before or after
-                diff = shttl_map[i].departure_datetime.timestamp() - \
+                diff = chosen_shttl_map[i].departure_datetime.timestamp() - \
                     rt.departure_datetime.timestamp()
             else:
                 diff = rt.departure_datetime.timestamp() -  \
-                    shttl_map[i].departure_datetime.timestamp()
+                    chosen_shttl_map[i].departure_datetime.timestamp()
 
-            if min_diff > diff and shttl_map[i].seats_available > 0 and diff >= 0:
+            if min_diff > diff and chosen_shttl_map[i].seats_available > 0 and diff >= 0:
                 min_diff_index = i
                 min_diff = diff
                 found = True
 
         if found:
             # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            r = shttl_map[min_diff_index].book()
-            del shttl_map[min_diff_index]
+            r = chosen_shttl_map[min_diff_index].book()
+            del chosen_shttl_map[min_diff_index]
             cprint(r)
             if rt.mode == "l":
                 cprint(f"""successfully booked shttl before (L) {rt.departure_datetime.time()}:
-  origin: {shttl_map[min_diff_index].origin}
-    date: {shttl_map[min_diff_index].departure_datetime.date()}
-    time: {shttl_map[min_diff_index].departure_datetime.time()}""", main)
+  origin: {chosen_shttl_map[min_diff_index].origin}
+    date: {chosen_shttl_map[min_diff_index].departure_datetime.date()}
+    time: {chosen_shttl_map[min_diff_index].departure_datetime.time()}""", main)
             else:
                 cprint(f"""successfully booked shttl after (R) {rt.departure_datetime.time()}:
-  origin: {shttl_map[min_diff_index].origin}
-    date: {shttl_map[min_diff_index].departure_datetime.date()}
-    time: {shttl_map[min_diff_index].departure_datetime.time()}""", main)
+  origin: {chosen_shttl_map[min_diff_index].origin}
+    date: {chosen_shttl_map[min_diff_index].departure_datetime.date()}
+    time: {chosen_shttl_map[min_diff_index].departure_datetime.time()}""", main)
             _book_queue.pop(0)
         else:
             cprint(f"""failed to book shttl:
@@ -554,60 +452,7 @@ def book_available(_book_queue, _now, main=False, n=3):
             rt = _book_queue[0]
         else:
             break
-
-
-def clock_upd():
-    """
-    main function that drives the app
-    """
-    global NOW
-    global SHTTL_LST
-    global SHTTL_MPS
-    global CONSOLE
-    global DAYS_FROM_START
-    global UPDATING_LOCK
-
-    currd = NOW.day
-    last_map_update = NOW
-    flag = False
-
-    while True:
-        time.sleep(REFRESH_RATE_CLOCK)
-        NOW = datetime.datetime.now()
-        t_from_last_map_update = NOW - last_map_update
-        # every REFRESH_RATE_SHTTL_LST seconds update SHTTL_LST
-        if t_from_last_map_update.seconds > REFRESH_RATE_SHTTL_LST:
-            UPDATING_LOCK = True
-            check_auth_and_exec(update_SHTTL_LST, (NOW, ))
-            UPDATING_LOCK = False
-            last_map_update = NOW
-
-        # execute schedule bookings when BOOK_TIME is surpassed
-        if not flag and NOW.hour >= BOOK_TIME.hour \
-                and NOW.minute >= BOOK_TIME.minute \
-                and NOW.second >= BOOK_TIME.second:
-            # try:
-            # update next three days
-            clog("updating SHTTL_LST", False)
-            check_auth_and_exec(update_SHTTL_LST, (NOW, ))
-            # book available routes
-            clog("booking available routes in BOOK_QUEUE_SCDL", False)
-            check_auth_and_exec(book_available, (BOOK_QUEUE_SCDL, NOW, ))
-            # except Exception as ex:
-            #     clog(
-            #         f"error occured while inserting scheduled bookings: {ex}", False)
-            flag = True
-        if currd < NOW.day:
-            flag = False
-            currd = NOW.day
-            # get shuttle maps
-            clog("getting shuttle maps", False)
-            SHTTL_MPS = get_shttl_map_n_days(NOW, 3)
-            clog("inserting scheduled bookings", False)
-            # insert schedule booings
-            insert_schedule_bookings(DAYS_FROM_START)
-            # update days from start
-            DAYS_FROM_START += 1
+# endregion
 
 
 # region commands
@@ -737,12 +582,12 @@ def updshttllist_handler(args):
 def bookqueue_handler(args):
     table = None
     if len(args) == 1:
-        table = gen_bookqueue_table(BOOK_QUEUE_USER)
+        table = table_gen.gen_bookqueue_table(BOOK_QUEUE_USER)
     else:
         if args[2] == "u" or args[2] == "user":
-            table = gen_bookqueue_table(BOOK_QUEUE_USER)
+            table = table_gen.gen_bookqueue_table(BOOK_QUEUE_USER)
         elif args[2] == "s" or args[2] == "schedule":
-            table = gen_bookqueue_table(BOOK_QUEUE_SCDL)
+            table = table_gen.gen_bookqueue_table(BOOK_QUEUE_SCDL)
         else:
             cprint(f"request couldnt be fullfilled: invalid argument")
 
@@ -756,10 +601,10 @@ def shttl_map_handler(args):
     global NOW
     table = None
     if len(args) == 1:
-        table = gen_shttl_map_table(SHTTL_MPS[0])
+        table = table_gen.gen_shttl_map_table(SHTTL_MPS[0])
     else:
         try:
-            table = gen_shttl_map_table(SHTTL_MPS[str(args[1])])
+            table = table_gen.gen_shttl_map_table(SHTTL_MPS[str(args[1])])
         except Exception as ex:
             clog(f"request couldnt be fullfilled: {ex}")
     if table != None:
@@ -772,10 +617,10 @@ def shttl_lst_handler(args):
     global NOW
     global SHTTL_LST
     if len(args) == 1:
-        table = gen_shttl_lst_table(SHTTL_LST)
+        table = table_gen.gen_shttl_lst_table(SHTTL_LST)
     else:
         try:
-            table = gen_shttl_lst_table_on_date(SHTTL_LST)
+            table = table_gen.gen_shttl_lst_table_on_date(SHTTL_LST)
         except Exception as ex:
             clog(f"request couldnt be fullfilled: {ex}")
     if table != None:
@@ -788,9 +633,8 @@ def clear_handler(args):
     os.system('cls')
 # endregion
 
+
 # region force_book cmd
-
-
 def force_book_handler(args):
     global NOW
     global SHTTL_MPS
@@ -802,7 +646,6 @@ def force_book_handler(args):
         s = SHTTL_MPS[args_processed[0]][args_processed[2]][args_processed[1]]
         r = s.book()
         cprint(r)
-# endregion
 
 
 def force_book_argument_parser(args):
@@ -835,6 +678,7 @@ def force_book_argument_parser(args):
         return [shttl_map_index, shttl_index, origin]
     except Exception as ex:
         cprint(f"request couldnt be fullfilled: {ex}")
+# endregion
 # endregion
 
 
@@ -890,6 +734,60 @@ def console_handler():
         if exec != None:
             tr_wrapper(exec[0], exec[1],)
 # endregion
+
+
+def clock_upd():
+    """
+    main function that drives the app
+    """
+    global NOW
+    global SHTTL_LST
+    global SHTTL_MPS
+    global CONSOLE
+    global DAYS_FROM_START
+    global UPDATING_LOCK
+
+    currd = NOW.day
+    last_map_update = NOW
+    flag = False
+
+    while True:
+        time.sleep(REFRESH_RATE_CLOCK)
+        NOW = datetime.datetime.now()
+        t_from_last_map_update = NOW - last_map_update
+        # every REFRESH_RATE_SHTTL_LST seconds update SHTTL_LST
+        if t_from_last_map_update.seconds > REFRESH_RATE_SHTTL_LST:
+            UPDATING_LOCK = True
+            check_auth_and_exec(update_SHTTL_LST, (NOW, ))
+            UPDATING_LOCK = False
+            last_map_update = NOW
+
+        # execute schedule bookings when BOOK_TIME is surpassed
+        if not flag and NOW.hour >= BOOK_TIME.hour \
+                and NOW.minute >= BOOK_TIME.minute \
+                and NOW.second >= BOOK_TIME.second:
+            # try:
+            # update next three days
+            clog("updating SHTTL_LST", False)
+            check_auth_and_exec(update_SHTTL_LST, (NOW, ))
+            # book available routes
+            clog("booking available routes in BOOK_QUEUE_SCDL", False)
+            check_auth_and_exec(book_available, (BOOK_QUEUE_SCDL, NOW, ))
+            # except Exception as ex:
+            #     clog(
+            #         f"error occured while inserting scheduled bookings: {ex}", False)
+            flag = True
+        if currd < NOW.day:
+            flag = False
+            currd = NOW.day
+            # get shuttle maps
+            clog("getting shuttle maps", False)
+            SHTTL_MPS = get_shttl_map_n_days(NOW, 3)
+            clog("inserting scheduled bookings", False)
+            # insert schedule booings
+            insert_schedule_bookings(DAYS_FROM_START)
+            # update days from start
+            DAYS_FROM_START += 1
 
 
 def startup():
