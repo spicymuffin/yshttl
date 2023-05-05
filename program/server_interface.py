@@ -495,8 +495,11 @@ def book_shttl(_data):
                                             "dm")
 
     r = request_book_shttl(ds)
+    r = r.replace("true", "True")
+    r = r.replace("false", "False")
+    d0 = ast.literal_eval(r)
 
-    print(r)
+    return d0
 
 
 def check_login():

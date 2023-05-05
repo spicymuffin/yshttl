@@ -186,7 +186,7 @@ class Route:
         self.seats_available = int(_dct["remndSeat"])
 
     def book(self):
-        server_interface.book_shttl(self.dct)
+        return server_interface.book_shttl(self.dct)
 
     def __repr__(self):
         return str(self)
@@ -361,8 +361,10 @@ def gen_shttl_lst_table(_shttl_lst):
     return table
 
 
-def gen_shttl_lst_table_on_date(_shttl_lst):
-    pass
+def gen_shttl_lst_table_on_date(_shttl_lst, _date):
+    for i in range(len(_shttl_lst)):
+        if _date in _shttl_lst[i].keys():
+            pass
 
 
 def gen_bookqueue_table(_book_queue):
@@ -528,7 +530,8 @@ def book_available(_book_queue, _now, main=False, n=3):
 
         if found:
             # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            shttl_map[min_diff_index].book()
+            r = shttl_map[min_diff_index].book()
+            cprint(r)
             if rt.mode == "l":
                 cprint(f"""successfully booked shttl before (L) {rt.departure_datetime.time()}:
   origin: {shttl_map[min_diff_index].origin}
@@ -621,13 +624,7 @@ def getcookies_handler(args):
 # region debug
 def debug_handler(args):
     pass
-    # global WMONID
-    # global JSESSIONID
-    # WMONID = "ASD"
-    # JSESSIONID = "ASD"
-    # server_interface.WMONID = WMONID
-    # server_interface.JSESSIONID = JSESSIONID
-    # check_auth_and_exec(check_book_queue, (NOW,))
+    cprint(args)
 # endregion
 
 
@@ -790,7 +787,7 @@ def clear_handler(args):
     os.system('cls')
 # endregion
 
-
+# region force_book cmd
 def force_book_handler(args):
     global NOW
     global SHTTL_MPS
@@ -800,7 +797,9 @@ def force_book_handler(args):
         cprint(f"request couldnt be fullfilled: {args_processed}")
     else:
         s = SHTTL_MPS[args_processed[0]][args_processed[2]][args_processed[1]]
-        s.book()
+        r = s.book()
+        cprint(r)
+# endregion
 
 
 def force_book_argument_parser(args):
