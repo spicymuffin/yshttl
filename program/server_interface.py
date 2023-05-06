@@ -692,7 +692,7 @@ def check_login():
 def get_booked_shttl_list(_origin, _departure_datetime):
     ds = gen_data_string_request_booked_shttl_list(_origin,
                                                    _departure_datetime)
-    r = request_booked_shttl_list(r)
+    r = request_booked_shttl_list(ds)
     d = parse_request_booked_shttl_list(r)
 
     if DEBUG:

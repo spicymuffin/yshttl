@@ -8,12 +8,8 @@ __smVisitorID_cookie_name = "__smVisitorID"
 WMONID_cookie_name = "WMONID"
 # endregion
 
-# delete before release pls
-userid = "**replaced USERID using filter-repo**"
-userpw = "**replaced PW using filter-repo**"
 
-
-def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS = False):
+def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS=False, NOTIFY_ERRORS=False):
     """ get authenticated cookies from underwood1.yonsei.ac.kr
 
     Args:
@@ -100,14 +96,15 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
         }
 
         SSOLegacy_do_prelogin_r_response = requests.post('https://underwood1.yonsei.ac.kr/SSOLegacy.do',
-                                                            cookies=SSOLegacy_do_prelogin_r_cookies,
-                                                            headers=SSOLegacy_do_prelogin_r_headers,
-                                                            data=SSOLegacy_do_prelogin_r_data)
+                                                         cookies=SSOLegacy_do_prelogin_r_cookies,
+                                                         headers=SSOLegacy_do_prelogin_r_headers,
+                                                         data=SSOLegacy_do_prelogin_r_data)
         # endregion
 
         # region dissect SSOLegacy_do_prelogin_r
         SSOLegacydo_prelogin_request_content = SSOLegacy_do_prelogin_r_response.content.decode()
-        scan_i = SSOLegacydo_prelogin_request_content.rfind('"S1"         value="') + len('"S1"         value="')
+        scan_i = SSOLegacydo_prelogin_request_content.rfind(
+            '"S1"         value="') + len('"S1"         value="')
         S1_prelogin = ""
         while SSOLegacydo_prelogin_request_content[scan_i] != '"':
             S1_prelogin += SSOLegacydo_prelogin_request_content[scan_i]
@@ -222,7 +219,7 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
         userpw = _userpw
 
         jsonObj = {'userid': userid, 'userpw': userpw,
-                    'ssoChallenge': ssoChallenge}
+                   'ssoChallenge': ssoChallenge}
 
         y = json.dumps(jsonObj, separators=(',', ':'))
         message = str(y)
@@ -271,7 +268,7 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
             ('E4', ''),
             ('ssoGubun', 'Redirect'),
             ('refererUrl',
-'https://underwood1.yonsei.ac.kr/passni/spLogin.jsp?returnUrl=L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl&locale={locale}'),
+             'https://underwood1.yonsei.ac.kr/passni/spLogin.jsp?returnUrl=L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl&locale={locale}'),
             ('a', 'aaaa'),
             ('b', 'bbbb'),
             ('returnUrl', 'L2NvbS9sZ2luL1Nzb0N0ci9pbml0RXh0UGFnZVdvcmsuZG8/bGluaz1zaHV0dGxl'),
@@ -287,6 +284,12 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
 
         # region PmSSOAuthService_r dissect
         PmSSOAuthService_r_response_content = PmSSOAuthService_r_response.content.decode()
+
+        scan_i = PmSSOAuthService_r_response_content.find('"E3"       value=')
+
+        # credential validity check
+        if scan_i == -1:
+            return "invalid user credentials"
 
         scan_i = PmSSOAuthService_r_response_content.find(
             '"E3"       value=') + len('"E3"       value=') + 1
@@ -370,10 +373,10 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
         }
 
         SSOLegacy_do_pname_spLogin_r_response = requests.post('https://underwood1.yonsei.ac.kr/SSOLegacy.do',
-                                                                params=SSOLegacy_do_pname_spLogin_r_params,
-                                                                cookies=SSOLegacy_do_pname_spLogin_r_cookies,
-                                                                headers=SSOLegacy_do_pname_spLogin_r_headers,
-                                                                data=SSOLegacy_do_pname_spLogin_r_data)
+                                                              params=SSOLegacy_do_pname_spLogin_r_params,
+                                                              cookies=SSOLegacy_do_pname_spLogin_r_cookies,
+                                                              headers=SSOLegacy_do_pname_spLogin_r_headers,
+                                                              data=SSOLegacy_do_pname_spLogin_r_data)
         # endregion
 
         # region spLoginProcess_jsp_1_r
@@ -421,8 +424,8 @@ def get_auth_cookies(_userid, _userpw, PRINT_DISSECT_VALS = False, NOTIFY_ERRORS
         }
 
         spLoginProcess_jsp_2_r_response = requests.get('https://underwood1.yonsei.ac.kr/passni/spLoginProcess.jsp',
-                                                        cookies=spLoginProcess_jsp_2_r_cookies,
-                                                        headers=spLoginProcess_jsp_2_r_headers)
+                                                       cookies=spLoginProcess_jsp_2_r_cookies,
+                                                       headers=spLoginProcess_jsp_2_r_headers)
         # endregion
 
         # region j_login_sso_do_r
