@@ -19,8 +19,8 @@ SHTTL_DICT_REFRESH_RATE = 20
 UPDATING_LOCK_NOTIFY_RATE = 1
 NOW = None
 
-USERID = "**replaced USERID using filter-repo**"
-USERPW = "**replaced PW using filter-repo**"
+USERID = ""
+USERPW = ""
 
 WMONID = ""
 JSESSIONID = ""

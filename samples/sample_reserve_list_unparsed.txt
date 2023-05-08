@@ -2,7 +2,7 @@
 {
     "gdmViewSession": {
         "msg":"success",
-        "userNm":"꾸씩루이지",
+        "userNm":"name",
         "encStr":"SvRXCvYqst4AsjKIvDSVdnpTiByoar4knruU0j6e9y8=",
         "deptNm":"컴퓨팅계열",
         "locale":"locale",

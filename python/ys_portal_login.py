@@ -73,7 +73,6 @@ SSOLegacy_prelogin_request_headers = {
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
     'Content-Type': 'application/x-www-form-urlencoded',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Origin': 'https://portal.yonsei.ac.kr',
     'Referer': 'https://portal.yonsei.ac.kr/passni/spLogin.jsp',
     'Sec-Fetch-Dest': 'iframe',
@@ -168,7 +167,6 @@ logindo_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Referer': 'https://portal.yonsei.ac.kr/ui/index.html',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -195,7 +193,6 @@ spLoginjsp1_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Referer': 'https://portal.yonsei.ac.kr/ui/index.html',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -224,7 +221,6 @@ SSOLegacydo_request_headers = {
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
     'Content-Type': 'application/x-www-form-urlencoded',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Origin': 'https://portal.yonsei.ac.kr',
     'Referer': 'https://portal.yonsei.ac.kr/passni/spLogin.jsp',
     'Sec-Fetch-Dest': 'document',
@@ -267,7 +263,6 @@ PmSSOService_request_headers = {
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
     'Content-Type': 'application/x-www-form-urlencoded',
-    # 'Cookie': 'JSESSIONID=xwOcz4ux87aOJFWfYxM9CuT6A2ADkGis4AcQb7Cm1nkNsWy9xZifOOaNpZlgi8fX.amV1c19kb21haW4vc3NvMV8x; __smVisitorID=sD5xQPjpKul',
     'Origin': 'https://portal.yonsei.ac.kr',
     'Referer': 'https://portal.yonsei.ac.kr/',
     'Sec-Fetch-Dest': 'document',
@@ -333,8 +328,8 @@ while PmSSOService_request_content[ssoChallenge_start_index] != "'":
 # endregion
 
 # region authentication
-userid = "**replaced USERID using filter-repo**"
-userpw = "**replaced PW using filter-repo**"
+userid = ""
+userpw = ""
 
 jsonObj = {'userid': userid, 'userpw': userpw, 'ssoChallenge': ssoChallenge}
 
@@ -360,7 +355,6 @@ PmSSOAuthService_request_headers = {
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
     'Content-Type': 'application/x-www-form-urlencoded',
-    # 'Cookie': 'JSESSIONID=xwOcz4ux87aOJFWfYxM9CuT6A2ADkGis4AcQb7Cm1nkNsWy9xZifOOaNpZlgi8fX.amV1c19kb21haW4vc3NvMV8x; __smVisitorID=sD5xQPjpKul',
     'Origin': 'https://infra.yonsei.ac.kr',
     'Referer': 'https://infra.yonsei.ac.kr/sso/PmSSOService',
     'Sec-Fetch-Dest': 'document',
@@ -446,7 +440,6 @@ SSOLegacydopnamespLoginData_request_headers = {
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
     'Content-Type': 'application/x-www-form-urlencoded',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Origin': 'https://infra.yonsei.ac.kr',
     'Referer': 'https://infra.yonsei.ac.kr/',
     'Sec-Fetch-Dest': 'document',
@@ -494,7 +487,6 @@ spLoginProcessjsp_postlogin1_request_headers = {
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
 }
@@ -515,7 +507,6 @@ spLoginProcessjsp_postlogin2_request_headers = {
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
     'Sec-Fetch-Site': 'cross-site',
@@ -540,7 +531,6 @@ j_login_ssodo_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Referer': 'https://portal.yonsei.ac.kr/passni/spLoginProcess.jsp',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -566,7 +556,6 @@ indexdo_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=s1k9Oq6x1-J; JSESSIONID=xhF99xsOgA6H5eOjY0T4Ry5CZ7R71gzT4cyCp3KBK198TT8yxlmJJTqauyxlu6cH.amV1c19kb21haW4vcG9ydGFsMl8x',
     'Referer': 'https://portal.yonsei.ac.kr/com/lgin/SsoCtr/j_login_sso.do',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -592,7 +581,6 @@ mainjsp_request_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en;q=0.9',
     'Connection': 'keep-alive',
-    # 'Cookie': '__smVisitorID=GrR1r_Bc3-2; JSESSIONID=9ZnJuMjemELqykRSs2p0rp13VCye9x794k5fsbifRiw1LQsIxu0c1xNhrBkHun3B.amV1c19kb21haW4vcG9ydGFsMV8x',
     'Referer': 'https://portal.yonsei.ac.kr/portal/MainCtr/index.do',
     'Sec-Fetch-Dest': 'iframe',
     'Sec-Fetch-Mode': 'navigate',
@@ -651,7 +639,6 @@ underwood1_WMONID_request_headers = {
     'Accept-Language': 'en-US,en-GB;q=0.9,en;q=0.8,it;q=0.7,ru;q=0.6,ko;q=0.5,ja;q=0.4',
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
-    # 'Cookie': 'JSESSIONID=cKQzlfUkLV9QYqLifyjfQmqduTJfg1Y8Vaat5TT0UqjItOmIxOLsDD71lbpjAkAy.amV1c19kb21haW4vaGFrc2ExXzE=; cugubun=FWoNcShBVqMoCNAVKOMoCNBWQIIi; UbiResult=DAh6COsSmpnYfeRSQ0OkbQ==',
     'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/j_login_sso.do?locale=ko',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -700,7 +687,6 @@ while s[scan_i] != ";":
 #     'Accept-Language': 'en-US,en;q=0.9',
 #     'Connection': 'keep-alive',
 #     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-#     # 'Cookie': 'cugubun=JYrRfQiAbtocKpIhetocKpJikomE; UbiResult=MRxhvwJB/cG8+H9KsVmYpg==; WMONID=VznSh_9GCE4; JSESSIONID=L74lx2VzQhcHhXnKtvrEdGrveQ6TMOmn4WYwznrfXyU8TKKEx9lmZ6QSa3aeVacW.amV1c19kb21haW4vaGFrc2ExXzE=',
 #     'Origin': 'https://underwood1.yonsei.ac.kr',
 #     'Referer': 'https://underwood1.yonsei.ac.kr/com/lgin/SsoCtr/initExtPageWork.do?link=shuttle',
 #     'Sec-Fetch-Dest': 'empty',
