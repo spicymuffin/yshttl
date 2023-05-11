@@ -105,8 +105,17 @@ def gen_shttl_lst_table(_booked_shttl_lst):
     pass
 
 
-def gen_bookqueue_table(_book_queue):
-    pass
+def gen_book_queue_table(_book_queue):
+    table = Table(title="book_queue")
+
+    table.add_column("#")
+    table.add_column("Date")
+    table.add_column("Time")
+    table.add_column("Origin")
+
+    for i in range(len(_book_queue)):
+        row = (str(i), )
+        table.add_row()
 
 
 def gen_shttl_map_table(_shttl_map):
