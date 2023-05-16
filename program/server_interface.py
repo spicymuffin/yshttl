@@ -474,7 +474,7 @@ def request_booked_shttl_list(_data_string):
         'sec-ch-ua-platform': '"Windows"',
     }
 
-    findShtlbusDtlsCanclList_do_r_data = '_menuId=MTA3NDkwNzI0MDIyNjk1MTQwMDA%3D&_menuNm=&_pgmId=MzI5MzAyNzI4NzE%3D&%40d1%23areaDivCd=I&%40d1%23stdrDt=20230506&%40d1%23resvePosblDt=1&%40d1%23seatDivCd=1&%40d1%23areaDivCd2=&%40d1%23stdrDt2=20230508&%40d1%23userDivCd=12&%40d%23=%40d1%23&%40d1%23=dmCond&%40d1%23tp=dm&'
+    findShtlbusDtlsCanclList_do_r_data = _data_string
 
     findShtlbusDtlsCanclList_do_r_response = requests.post(
         'https://underwood1.yonsei.ac.kr/sch/shtl/ShtlrmCtr/findShtlbusDtlsCanclList.do',
@@ -512,7 +512,7 @@ def gen_data_string_request_booked_shttl_list(_areaDivCd, _stdrDt, _resvePosblDt
     resvePosblDt = _resvePosblDt
     seatDivCd = _seatDivCd
     areaDivCd2 = _areaDivCd2
-    stdrDt2 = _stdrDt2
+    stdrDt2 = _stdrDt
     userDivCd = _userDivCd
     d_hashtag = _d_hashtag
     d_one_hastag = _d_one_hastag
@@ -562,7 +562,7 @@ def gen_data_string_request_booked_shttl_list(_areaDivCd, _stdrDt, _resvePosblDt
     dsb.ds_append(menuNm_name, menuNm)
     dsb.ds_append(pgmId_name, pgmId)
     dsb.ds_append(areaDivCd_name, areaDivCd)
-    dsb.ds_append(stdrDt_name,  stdrDt)
+    dsb.ds_append(stdrDt_name, stdrDt)
     dsb.ds_append(resvePosblDt_name, resvePosblDt)
     dsb.ds_append(seatDivCd_name, seatDivCd)
     dsb.ds_append(areaDivCd2_name, areaDivCd2)
