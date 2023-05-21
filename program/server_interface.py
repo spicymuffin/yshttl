@@ -680,12 +680,17 @@ def book_shttl(_data):
 
 
 def check_login():
-    r = request_user_info()
-    r = r.replace("true", "True")
-    r = r.replace("false", "False")
-    d0 = ast.literal_eval(r)
-    if DEBUG:
-        print(d0)
+    d0 = None
+    try:
+        r = request_user_info()
+        r = r.replace("true", "True")
+        r = r.replace("false", "False")
+        d0 = ast.literal_eval(r)
+        if DEBUG:
+            print(d0)
+    except Exception as ex:
+        print("error checking login data")
+        return False
     return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
 
 
