@@ -47,7 +47,7 @@ def gen_shttl_lst_table(_shttl_lst):
 
 
 def gen_booked_shttl_lst_table(_booked_shttl_lst):
-    table = Table(title="SHTTL_LST")
+    table = Table(title="BOOKED_SHTTL_LST")
     mxI = -1
     mxS = -1
     for i in range(len(_booked_shttl_lst)):
@@ -68,7 +68,7 @@ def gen_booked_shttl_lst_table(_booked_shttl_lst):
                 clmn.append('I')
                 clmn.append(str(_booked_shttl_lst[i]['I'][j].seats_available))
             else:
-                for i in range(3):
+                for i in range(2):
                     clmn.append('-')
         table.add_row(*clmn)
 
@@ -83,7 +83,7 @@ def gen_booked_shttl_lst_table(_booked_shttl_lst):
                 clmn.append('S')
                 clmn.append(str(_booked_shttl_lst[i]['S'][j].seats_available))
             else:
-                for i in range(3):
+                for i in range(2):
                     clmn.append('-')
         table.add_row(*clmn)
     return table
