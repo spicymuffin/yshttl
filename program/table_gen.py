@@ -95,7 +95,8 @@ def gen_shttl_lst_table_on_date(_shttl_lst, _date):  # TODO: implement this
             pass
 
 
-def gen_booked_shttl_lst_table_on_date(_shttl_lst, _date):  # TODO: implement this
+# TODO: implement this
+def gen_booked_shttl_lst_table_on_date(_shttl_lst, _date):
     for i in range(len(_shttl_lst)):
         if _date in _shttl_lst[i].keys():
             pass
@@ -110,8 +111,11 @@ def gen_book_queue_table(_book_queue):
     table.add_column("Origin")
 
     for i in range(len(_book_queue)):
-        row = (str(i), )
-        table.add_row()
+        row = (str(i), str(_book_queue[i].departure_datetime.date()), str(
+            _book_queue[i].departure_datetime.time()), _book_queue[i].origin)
+        table.add_row(*row)
+
+    return table
 
 
 def gen_shttl_map_table(_shttl_map):
