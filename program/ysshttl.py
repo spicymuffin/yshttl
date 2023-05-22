@@ -44,6 +44,7 @@ AUTH_SESSION_LENGTH = 60 * 5  # in seconds
 # region bools
 DEBUG = False  # enable debuggin mode
 CLEAN_SCHEDULE = False  # set clean schedule for debugging purposes
+IGNORE_3DAYS = True
 # endregion
 # endregion
 
@@ -94,7 +95,7 @@ DEFAULT_CONFIG = {**replaced ID using filter-repo**,
     SHTTL_MPS = get_shttl_map_n_days(NOW)
 
     # book 7 days ahead
-    for i in range(DAYS_FROM_START):
+    for i in range(3 if IGNORE_3DAYS else 0, DAYS_FROM_START):
         insert_schedule_bookings(i)
 
     # start clock thread
