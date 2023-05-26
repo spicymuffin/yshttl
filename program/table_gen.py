@@ -50,10 +50,10 @@ def gen_booked_shttl_lst_table(_booked_shttl_lst):
     table = Table(title="BOOKED_SHTTL_LST")
     mxI = -1
     mxS = -1
+    table.add_column("#")
     for i in range(len(_booked_shttl_lst)):
         table.add_column(f"{_booked_shttl_lst[i]['date']} times")
         table.add_column("origin")
-        table.add_column("# seats")
         if mxI < len(_booked_shttl_lst[i]['I']):
             mxI = len(_booked_shttl_lst[i]['I'])
         if mxS < len(_booked_shttl_lst[i]['S']):
@@ -61,6 +61,7 @@ def gen_booked_shttl_lst_table(_booked_shttl_lst):
 
     for j in range(mxI):
         clmn = []
+        clmn.append(str(j))
         for i in range(len(_booked_shttl_lst)):
             if len(_booked_shttl_lst[i]['I']) > j:
                 clmn.append(
