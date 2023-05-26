@@ -66,7 +66,6 @@ def gen_booked_shttl_lst_table(_booked_shttl_lst):
                 clmn.append(
                     str(_booked_shttl_lst[i]['I'][j].departure_datetime.time()))
                 clmn.append('I')
-                clmn.append(str(_booked_shttl_lst[i]['I'][j].seats_available))
             else:
                 for i in range(2):
                     clmn.append('-')
