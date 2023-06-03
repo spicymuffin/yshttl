@@ -152,55 +152,59 @@ def request_shttl_list(_data_string):
 
 
 def parse_request_shttl_list(resp):
-    index = 0
-    while resp[index] != "[":
-        index += 1
-    index += 1  # skip [
-    bus_l = []
-    bus_n = 0
-    while index < len(resp):
-        if resp[index] == '{':
-            bus_l.append("")
-        elif resp[index] == '}':
-            bus_n += 1
+    try:
+        index = 0
+        while resp[index] != "[":
             index += 1
-        elif resp[index] == ']':
-            break
-        else:
-            bus_l[bus_n] += resp[index]
-        index += 1
-
-    for i in range(len(bus_l)):
-        bus = bus_l[i]
-        d0 = dict()
-        key = ""
-        value = ""
-        j = 0
-        while j < len(bus):
-            # control write state
-            if bus[j] == '"':
-                j += 1
-                while bus[j] != '"':
-                    key += bus[j]
-                    j += 1
-            j += 1
-            j += 1
-            if bus[j] == '"':
-                j += 1
-                while j < len(bus) and bus[j] != '"':
-                    value += bus[j]
-                    j += 1
-                j += 1
+        index += 1  # skip [
+        bus_l = []
+        bus_n = 0
+        while index < len(resp):
+            if resp[index] == '{':
+                bus_l.append("")
+            elif resp[index] == '}':
+                bus_n += 1
+                index += 1
+            elif resp[index] == ']':
+                break
             else:
-                while j < len(bus) and bus[j] != ',':
-                    value += bus[j]
-                    j += 1
-                # value = int(value)
-            j += 1
-            d0[key] = value
-            value = ""
+                bus_l[bus_n] += resp[index]
+            index += 1
+
+        for i in range(len(bus_l)):
+            bus = bus_l[i]
+            d0 = dict()
             key = ""
-        bus_l[i] = d0
+            value = ""
+            j = 0
+            while j < len(bus):
+                # control write state
+                if bus[j] == '"':
+                    j += 1
+                    while bus[j] != '"':
+                        key += bus[j]
+                        j += 1
+                j += 1
+                j += 1
+                if bus[j] == '"':
+                    j += 1
+                    while j < len(bus) and bus[j] != '"':
+                        value += bus[j]
+                        j += 1
+                    j += 1
+                else:
+                    while j < len(bus) and bus[j] != ',':
+                        value += bus[j]
+                        j += 1
+                    # value = int(value)
+                j += 1
+                d0[key] = value
+                value = ""
+                key = ""
+            bus_l[i] = d0
+    except Exception as ex:
+        print("failed to parse request_shttl_list")
+        return -1
     return bus_l
 # endregion
 
@@ -576,55 +580,59 @@ def gen_data_string_request_booked_shttl_list(_areaDivCd, _stdrDt, _resvePosblDt
 
 
 def parse_request_booked_shttl_list(resp):
-    index = 0
-    while resp[index] != "[":
-        index += 1
-    index += 1  # skip [
-    bus_l = []
-    bus_n = 0
-    while index < len(resp):
-        if resp[index] == '{':
-            bus_l.append("")
-        elif resp[index] == '}':
-            bus_n += 1
+    try:
+        index = 0
+        while resp[index] != "[":
             index += 1
-        elif resp[index] == ']':
-            break
-        else:
-            bus_l[bus_n] += resp[index]
-        index += 1
-
-    for i in range(len(bus_l)):
-        bus = bus_l[i]
-        d0 = dict()
-        key = ""
-        value = ""
-        j = 0
-        while j < len(bus):
-            # control write state
-            if bus[j] == '"':
-                j += 1
-                while bus[j] != '"':
-                    key += bus[j]
-                    j += 1
-            j += 1
-            j += 1
-            if bus[j] == '"':
-                j += 1
-                while j < len(bus) and bus[j] != '"':
-                    value += bus[j]
-                    j += 1
-                j += 1
+        index += 1  # skip [
+        bus_l = []
+        bus_n = 0
+        while index < len(resp):
+            if resp[index] == '{':
+                bus_l.append("")
+            elif resp[index] == '}':
+                bus_n += 1
+                index += 1
+            elif resp[index] == ']':
+                break
             else:
-                while j < len(bus) and bus[j] != ',':
-                    value += bus[j]
-                    j += 1
-                # value = int(value)
-            j += 1
-            d0[key] = value
-            value = ""
+                bus_l[bus_n] += resp[index]
+            index += 1
+
+        for i in range(len(bus_l)):
+            bus = bus_l[i]
+            d0 = dict()
             key = ""
-        bus_l[i] = d0
+            value = ""
+            j = 0
+            while j < len(bus):
+                # control write state
+                if bus[j] == '"':
+                    j += 1
+                    while bus[j] != '"':
+                        key += bus[j]
+                        j += 1
+                j += 1
+                j += 1
+                if bus[j] == '"':
+                    j += 1
+                    while j < len(bus) and bus[j] != '"':
+                        value += bus[j]
+                        j += 1
+                    j += 1
+                else:
+                    while j < len(bus) and bus[j] != ',':
+                        value += bus[j]
+                        j += 1
+                    # value = int(value)
+                j += 1
+                d0[key] = value
+                value = ""
+                key = ""
+            bus_l[i] = d0
+    except Exception as ex:
+        print("failed to parse request_booked_shttl_list")
+        return -1
     return bus_l
 # endregion
 # endregion
@@ -636,12 +644,6 @@ def get_shttl_list(_origin, _departure_datetime):
                                             _departure_datetime)
     r = request_shttl_list(ds)
     d = parse_request_shttl_list(r)
-
-    if DEBUG:
-        for b in d:
-            print("====== bus change ======")
-            for key, value in b.items():
-                print(f"{key}: {value}")
 
     return d
 
