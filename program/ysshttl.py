@@ -2,25 +2,26 @@
 import table_gen
 import server_interface
 import auth_master
+
 # pip
 import threading
 import datetime
 import json
 import time
 import os
+
 # rich
 from rich.console import Console
-from rich import print as rprint
 
 # region constants
 # region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
 SCHEDULE_FILE_NAME = "schedule.json"
-SCHEDULE_FILE_PATH = CURR_PATH + '\\' + SCHEDULE_FILE_NAME
+SCHEDULE_FILE_PATH = CURR_PATH + "\\" + SCHEDULE_FILE_NAME
 CONFIG_FILE_NAME = "config.json"
-CONFIG_FILE_PATH = CURR_PATH + '\\' + CONFIG_FILE_NAME
+CONFIG_FILE_PATH = CURR_PATH + "\\" + CONFIG_FILE_NAME
 COOKIE_JAR_FILE_NAME = "cookie_jar.txt"
-COOKIE_JAR_FILE_PATH = CURR_PATH + '\\' + COOKIE_JAR_FILE_NAME
+COOKIE_JAR_FILE_PATH = CURR_PATH + "\\" + COOKIE_JAR_FILE_NAME
 # endregion
 
 
@@ -31,7 +32,7 @@ USERPW = ""
 # endregion
 
 # region refresh rates
-REFRESH_RATE_CLOCK = 1/4  # in seconds
+REFRESH_RATE_CLOCK = 1 / 4  # in seconds
 REFRESH_RATE_SHTTL_LST = 30  # in seconds
 # endregion
 
@@ -70,16 +71,19 @@ UPDATING_LOCK = False
 # endregion
 
 # region true constants
-DEFAULT_SCHEDULE = {"0": [],
-                    "1": [],
-                    "2": [],
-                    "3": [],
-                    "4": [],
-                    "5": [],
-                    "6": []}
+DEFAULT_SCHEDULE = {
+    "0": [],
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+}
 
-DEFAULT_CONFIG = {**replaced ID using filter-repo**,
-                  **replaced PW using filter-repo**)
+DEFAULT_CONFIG = {
+    **replaced ID using filter-repo**,
+    **replaced PW using filter-repo**)
     # endregion
 
     # set dates, times
