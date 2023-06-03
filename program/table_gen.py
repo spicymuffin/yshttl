@@ -93,7 +93,8 @@ def gen_booked_shttl_lst_table(_booked_shttl_lst):
     return table
 
 
-def gen_shttl_lst_table_on_date(_shttl_lst, _date):  # TODO: implement this
+# TODO: implement this
+def gen_shttl_lst_table_on_date(_shttl_lst, _date):
     for i in range(len(_shttl_lst)):
         if _date in _shttl_lst[i].keys():
             pass
