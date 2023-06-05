@@ -114,6 +114,7 @@ def gen_book_queue_table(_book_queue):
     table.add_column("Date")
     table.add_column("Time")
     table.add_column("Origin")
+    table.add_column("Mode")
 
     for i in range(len(_book_queue)):
         row = (
@@ -121,6 +122,7 @@ def gen_book_queue_table(_book_queue):
             str(_book_queue[i].departure_datetime.date()),
             str(_book_queue[i].departure_datetime.time()),
             _book_queue[i].origin,
+            str(_book_queue[i].mode)
         )
         table.add_row(*row)
 
