@@ -5,6 +5,11 @@
  3. make long term booking reservations (the program remembers to book in your stead)
  4. show booked shuttles
  5. cancel booked shuttles (not implemented yet in ver. 2.2)
+
+ ## how to use
+run yshttl.py with python 3.11 or newer. use CLI to operate the program.
+
+use command "help" to get started.
  
  ## configuration file values explanation:
    ***(its a json file that is automatically created on first launch)***
