@@ -482,9 +482,7 @@ def request_user_info(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"Windows"',
     }
-    findViewSession_do_r_data = (
-        "_menuId=MzMzODYzMjY%3D&_menuNm=&_pgmId=MTg3NDA2&"
-    )
+    findViewSession_do_r_data = "_menuId=MzMzODYzMjY%3D&_menuNm=&_pgmId=MTg3NDA2&"
     findViewSession_do_r_response = requests.post(
         "https://underwood1.yonsei.ac.kr/com/cnst/PropCtr/findViewSession.do",
         cookies=findViewSession_do_r_cookies,
@@ -753,10 +751,21 @@ def check_login(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
     return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
 
 
+def get_user_info(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
+    d0 = None
+    try:
+        r = request_user_info(_WMONID, _JSESSIONID)
+        r = r.replace("true", "True")
+        r = r.replace("false", "False")
+        d0 = ast.literal_eval(r)
+    except Exception as ex:
+        print("error getting user info")
+        return None
+    return d0
+
+
 def get_booked_shttl_list(_origin, _departure_datetime, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
-    ds = gen_data_string_request_booked_shttl_list(
-        _origin, _departure_datetime
-    )
+    ds = gen_data_string_request_booked_shttl_list(_origin, _departure_datetime)
     r = request_booked_shttl_list(ds, _WMONID, _JSESSIONID)
     d = parse_request_booked_shttl_list(r)
 

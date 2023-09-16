@@ -1,17 +1,8 @@
 {
-  "USERID_02": "**replaced USERID using filter-repo**",
-  "USERPW_02": "**replaced PW using filter-repo**",
-  "USERID_01": "**replaced USERID using filter-repo**",
-  "USERPW_01": "**replaced PW using filter-repo**",
-  "USERID_00": "**replaced USERID using filter-repo**",
-  "USERPW_00": "**replaced PW using filter-repo**",
-
-  "REFRESH_RATE_CLOCK": 0.25,
-  "REFRESH_RATE_SHTTL_LST": 30,
-  "BOOK_TIME": "0 2 0",
-  "DAYS_FROM_START": 7,
-  "AUTH_SESSION_LENGTH": 300,
-  "DEBUG": false,
-  "CLEAN_SCHEDULE": true,
-  "IGNORE_3DAYS": true
+  "USER_CREDENTIALS": {
+    "USER_00": {
+      "ALIAS": "**replaced ALIAS using filter-repo**",
+      **replaced ID using filter-repo**,
+      **replaced PW using filter-repo**: true
+  }
 }

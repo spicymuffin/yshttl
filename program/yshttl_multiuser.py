@@ -9,9 +9,16 @@ import datetime
 import json
 import time
 import os
+import sys
+import msvcrt
 
 # rich
 from rich.console import Console
+
+# turn off warnings
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # region constants
 # region file management
@@ -26,8 +33,8 @@ CONFIG_FILE_PATH = CURR_PATH + "\\" + CONFIG_FILE_NAME
 # region config file defined
 # region users
 USERS = []
-DEFAULT_USER = None
-ACTIVE_USER = DEFAULT_USER
+ACTIVE_USER = None
+
 # endregion
 
 # region refresh rates
@@ -53,7 +60,7 @@ IGNORE_3DAYS = True
 START_DAY = None
 CONSOLE = None
 
-SHTTL_MPS = []
+SHTTL_MPS = []  # global shuttle maps for all user
 
 thread_clock_upd = None
 
@@ -84,34 +91,7 @@ EMPTY_SCHEDULE = {
 }
 
 DEFAULT_CONFIG = {
-    "USER_00": {
-        **replaced ID using filter-repo**,
-        **replaced PW using filter-repo**)
-
-    # endregion
-
-    # set dates, times
-    NOW = datetime.datetime.now()
-    START_DAY = NOW.date()
-
-    # check auth
-    check_auth_reauth()
-
-    # startup SHTTL_LST
-    update_SHTTL_LST(NOW)
-    # startup SHTTL_MPS
-    SHTTL_MPS = get_shttl_map_n_days(NOW)
-
-    # book 7 days ahead
-    for i in range(3 if IGNORE_3DAYS else 0, DAYS_FROM_START):
-        insert_schedule_bookings(i)
-
-    # start clock thread
-    thread_clock_upd = threading.Thread(target=clock_upd)
-    thread_clock_upd.daemon = True
-    thread_clock_upd.start()
-
-    # start console
+    "USER_00": {**replaced ID using filter-repo**, **replaced PW using filter-repo**, main=False)
     console_handler()
 
 

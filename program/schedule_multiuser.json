@@ -1,20 +1,25 @@
 {
-  "SCHEDULE_00": {
+  "USER_00": {
     "0": [
       {
         "origin": "S",
-        "time": "09:30",
-        "mode": "l"
+        "time": "15:10",
+        "mode": "r"
       },
       {
-        "origin": "I",
+        "origin": "S",
         "time": "12:30",
-        "mode": "l"
+        "mode": "r"
       },
       {
-        "origin": "I",
-        "time": "13:30",
-        "mode": "l"
+        "origin": "S",
+        "time": "17:30",
+        "mode": "r"
+      },
+      {
+        "origin": "S",
+        "time": "20:00",
+        "mode": "r"
       }
     ],
     "1": [
@@ -24,14 +29,9 @@
         "mode": "l"
       },
       {
-        "origin": "I",
-        "time": "17:20",
-        "mode": "r"
-      },
-      {
-        "origin": "I",
-        "time": "17:30",
-        "mode": "r"
+        "origin": "S",
+        "time": "08:30",
+        "mode": "l"
       }
     ],
     "2": [
@@ -61,18 +61,75 @@
     "4": [
       {
         "origin": "I",
-        "time": "15:00",
-        "mode": "l"
+        "time": "13:30",
+        "mode": "r"
       },
       {
         "origin": "I",
-        "time": "12:00",
-        "mode": "l"
+        "time": "16:10",
+        "mode": "r"
       },
       {
         "origin": "I",
-        "time": "18:00",
+        "time": "18:30",
+        "mode": "r"
+      },
+      {
+        "origin": "I",
+        "time": "19:00",
+        "mode": "r"
+      }
+    ],
+    "5": [],
+    "6": []
+  },
+  "USER_01": {
+    "0": [
+      {
+        "origin": "S",
+        "time": "11:00",
         "mode": "l"
+      },
+      {
+        "origin": "S",
+        "time": "10:00",
+        "mode": "l"
+      }
+    ],
+    "1": [
+      {
+        "origin": "S",
+        "time": "17:30",
+        "mode": "r"
+      },
+      {
+        "origin": "I",
+        "time": "17:30",
+        "mode": "l"
+      }
+    ],
+    "2": [],
+    "3": [],
+    "4": [
+      {
+        "origin": "S",
+        "time": "13:30",
+        "mode": "r"
+      },
+      {
+        "origin": "S",
+        "time": "16:10",
+        "mode": "r"
+      },
+      {
+        "origin": "S",
+        "time": "18:30",
+        "mode": "r"
+      },
+      {
+        "origin": "S",
+        "time": "19:00",
+        "mode": "r"
       }
     ],
     "5": [],
