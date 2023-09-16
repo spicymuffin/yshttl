@@ -24,9 +24,10 @@ CONFIG_FILE_PATH = CURR_PATH + "\\" + CONFIG_FILE_NAME
 
 
 # region config file defined
-# region credentials
+# region users
 USERS = []
 DEFAULT_USER = None
+ACTIVE_USER = DEFAULT_USER
 # endregion
 
 # region refresh rates
@@ -49,28 +50,19 @@ IGNORE_3DAYS = True
 
 
 # region runtime calculated
-WMONID = ""
-JSESSIONID = ""
-
 START_DAY = None
 CONSOLE = None
-SCHEDULE = None
 
-SHTTL_LST = []
 SHTTL_MPS = []
-BOOKED_SHTTL_LST = []
 
 thread_clock_upd = None
-
-BOOK_QUEUE_SCDL = []
-BOOK_QUEUE_USER = []
 
 UPDATING_LOCK = False
 # endregion
 
-# region true constants
+# region actual constants
 DEFAULT_SCHEDULE = {
-    "SCHEDULE_00": {
+    "USER_00": {
         "0": [],
         "1": [],
         "2": [],

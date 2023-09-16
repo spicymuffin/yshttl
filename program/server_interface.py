@@ -127,10 +127,10 @@ def gen_data_string_request_shttl_list(
     return dsb.ds
 
 
-def request_shttl_list(_data_string):
+def request_shttl_list(_data_string, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
     findShtlbusResveList_do_r_cookies = {
-        "WMONID": WMONID,
-        "JSESSIONID": JSESSIONID,
+        "WMONID": _WMONID,
+        "JSESSIONID": _JSESSIONID,
     }
 
     findShtlbusResveList_do_r_headers = {
@@ -422,10 +422,10 @@ def gen_data_string_request_book_shttl(
     return dsb.ds
 
 
-def request_book_shttl(_data_string):
+def request_book_shttl(_data_string, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
     saveShtlbusResveList_do_r_cookies = {
-        "WMONID": WMONID,
-        "JSESSIONID": JSESSIONID,
+        "WMONID": _WMONID,
+        "JSESSIONID": _JSESSIONID,
     }
 
     saveShtlbusResveList_do_r_headers = {
@@ -461,10 +461,10 @@ def request_book_shttl(_data_string):
 
 
 # region request user_info
-def request_user_info():
+def request_user_info(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
     findViewSession_do_r_cookies = {
-        "WMONID": WMONID,
-        "JSESSIONID": JSESSIONID,
+        "WMONID": _WMONID,
+        "JSESSIONID": _JSESSIONID,
     }
     findViewSession_do_r_headers = {
         "Accept": "*/*",
@@ -498,10 +498,10 @@ def request_user_info():
 
 
 # region request_booked_shttl_list
-def request_booked_shttl_list(_data_string):
+def request_booked_shttl_list(_data_string, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
     findShtlbusDtlsCanclList_do_r_cookies = {
-        "WMONID": WMONID,
-        "JSESSIONID": JSESSIONID,
+        "WMONID": _WMONID,
+        "JSESSIONID": _JSESSIONID,
     }
 
     findShtlbusDtlsCanclList_do_r_headers = {
@@ -695,15 +695,15 @@ def parse_request_booked_shttl_list(resp):
 
 
 # region high level wrappers
-def get_shttl_list(_origin, _departure_datetime):
+def get_shttl_list(_origin, _departure_datetime, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
     ds = gen_data_string_request_shttl_list(_origin, _departure_datetime)
-    r = request_shttl_list(ds)
+    r = request_shttl_list(ds, _WMONID, _JSESSIONID)
     d = parse_request_shttl_list(r)
 
     return d
 
 
-def book_shttl(_data):
+def book_shttl(_data, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
     ds = gen_data_string_request_book_shttl(
         _data["areaDivCd"],
         _data["busCd"],
@@ -730,7 +730,7 @@ def book_shttl(_data):
         "dm",
     )
 
-    r = request_book_shttl(ds)
+    r = request_book_shttl(ds, _WMONID, _JSESSIONID)
     r = r.replace("true", "True")
     r = r.replace("false", "False")
     d0 = ast.literal_eval(r)
@@ -738,10 +738,10 @@ def book_shttl(_data):
     return d0
 
 
-def check_login():
+def check_login(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
     d0 = None
     try:
-        r = request_user_info()
+        r = request_user_info(_WMONID, _JSESSIONID)
         r = r.replace("true", "True")
         r = r.replace("false", "False")
         d0 = ast.literal_eval(r)
@@ -753,11 +753,11 @@ def check_login():
     return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
 
 
-def get_booked_shttl_list(_origin, _departure_datetime):
+def get_booked_shttl_list(_origin, _departure_datetime, _WMONID=WMONID, _JSESSIONID=JSESSIONID):
     ds = gen_data_string_request_booked_shttl_list(
         _origin, _departure_datetime
     )
-    r = request_booked_shttl_list(ds)
+    r = request_booked_shttl_list(ds, _WMONID, _JSESSIONID)
     d = parse_request_booked_shttl_list(r)
 
     if DEBUG:
