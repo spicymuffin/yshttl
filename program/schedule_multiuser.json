@@ -41,7 +41,7 @@
         "mode": "l"
       },
       {
-        "origin": "S",
+        "origin": "I",
         "time": "16:30",
         "mode": "l"
       }
@@ -118,22 +118,22 @@
     "3": [],
     "4": [
       {
-        "origin": "S",
+        "origin": "I",
         "time": "13:30",
         "mode": "r"
       },
       {
-        "origin": "S",
+        "origin": "I",
         "time": "16:10",
         "mode": "r"
       },
       {
-        "origin": "S",
+        "origin": "I",
         "time": "18:30",
         "mode": "r"
       },
       {
-        "origin": "S",
+        "origin": "I",
         "time": "19:00",
         "mode": "r"
       }
