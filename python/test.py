@@ -139,9 +139,262 @@
 #     print("Alarm1")
 #     sys.stdout.flush()
 
-from io import StringIO
-from rich.console import Console
-console = Console(file=StringIO())
-console.print("[bold red]Hello[/] World")
-str_output = console.file.getvalue()
-console.print(str_output)
+# from io import StringIO
+# from rich.console import Console
+# console = Console(file=StringIO())
+# console.print("[bold red]Hello[/] World")
+# str_output = console.file.getvalue()
+# console.print(str_output)
+
+
+# class testclass:
+#     def __init__(self, _name) -> None:
+#         self.name = _name
+
+#     def __str__(self) -> str:
+#         return self.name
+
+#     def __repr__(self) -> str:
+#         return self.__str__()
+
+
+# a = testclass("object1")
+
+# list1 = []
+# list2 = []
+
+# list1.append(a)
+# list2.append(a)
+
+# print(list1)
+# print(list2)
+
+# a.name = "modified"
+# b = a
+# b.name = "modified twice"
+
+# print(list1)
+# print(list2)
+
+# del list1[0]
+
+# print(list1)
+# print(list2)
+
+# import os
+# print(next(os.walk('C:/Users/**replaced ALIAS using filter-repo**/Desktop/github/yshttl/program/book_queries'))[1])
+
+import datetime
+
+
+def book_email_query_details_parser(details):
+    def verbal_interpret(argument, _today):
+        today_weekday = _today.weekday()
+
+        argument = argument.lower()
+
+        if argument == "td" or argument == "today":
+            return 0
+        elif argument == "tmo" or argument == "tmr" or argument == "tomorrow":
+            return 1
+        elif argument == "ovm" or argument == "overmorrow":
+            return 2
+
+        # 7 but zero indexed so 6 days a week
+        argument = list(argument)  # gotta be fast
+        argument.reverse()
+
+        next_cnt = 0
+        delta = 6 - today_weekday
+        cache = ""
+        while len(argument) != 0:
+            letter = argument.pop()
+            cache += letter
+
+            if cache == "next":
+                if next_cnt != 0:
+                    delta += 7
+                next_cnt += 1
+                cache = ""
+            elif cache == "mon":
+                delta += 1
+                return delta
+            elif cache == "tue":
+                delta += 2
+                return delta
+            elif cache == "wed":
+                delta += 3
+                return delta
+            elif cache == "thu":
+                delta += 4
+                return delta
+            elif cache == "fri":
+                delta += 5
+                return delta
+            elif cache == "sat":
+                delta += 6
+                return delta
+            elif cache == "sun":
+                delta += 7
+                return delta
+            elif len(cache) >= 5:
+                return ValueError()
+
+        return delta
+
+    try:
+        today = datetime.date.today()
+
+        today_year = today.year
+        today_month = today.month
+        today_day = today.day
+
+        parsed_origin = None
+        parsed_date = None
+        parsed_time = None
+        parsed_mode = "l"
+
+        assembly_year = 0
+        assembly_month = 0
+        assembly_day = 0
+
+        assembly_hour = 0
+        assembly_minute = 0
+
+        # kwarg mode
+        if "=" in details:
+            args = details.split(" ")
+            i = 0
+            while i < len(args):
+                if args[i] == "":
+                    del args[i]
+                else:
+                    i += 1
+
+            i = 0
+            while i < len(args):
+                args[i] = args[i].split("=")
+                i += 1
+
+            for kwarg in args:
+                if len(kwarg) < 2:
+                    return ("kwarg", "malformed keyword argument")
+                kwarg[0] = kwarg[0].lower()
+                if kwarg[0] == "o" or kwarg[0] == "origin":
+                    parsed_origin = kwarg[1]
+                elif kwarg[0] == "d" or kwarg[0] == "date":
+                    parsed_date = kwarg[1]
+                elif kwarg[0] == "t" or kwarg[0] == "time":
+                    parsed_time = kwarg[1]
+                elif kwarg[0] == "m" or kwarg[0] == "mode":
+                    parsed_mode = kwarg[1]
+                else:
+                    return ("kwarg", f"unknown keyword argument: {kwarg[0]}")
+
+            if parsed_origin is None:
+                return ("kwarg", "origin not supplied")
+            if parsed_date is None:
+                return ("kwarg", "date not supplied")
+            if parsed_time is None:
+                return ("kwarg", "time not supplied")
+
+        # no kwarg mode
+        else:
+            args = details.split(" ")
+            i = 0
+            while i < len(args):
+                if args[i] == "":
+                    del args[i]
+                else:
+                    i += 1
+
+            if len(args) < 3:
+                return ("orderedarg", "insufficient args")
+            parsed_origin = args[0]
+            parsed_date = args[1]
+            parsed_time = args[2]
+            if len(args) >= 4:
+                parsed_mode = args[3]
+
+        parsed_origin = parsed_origin.lower()
+        parsed_date = parsed_date.lower()
+        parsed_time = parsed_time.lower()
+        parsed_mode = parsed_mode.lower()
+
+        # parse args sinchon songdo
+        if parsed_origin == "sinchon" or parsed_origin == "s":
+            parsed_origin = "S"
+        elif (
+            parsed_origin == "international"
+            or parsed_origin == "i"
+            or parsed_origin == "songdo"
+        ):
+            parsed_origin = "I"
+        else:
+            return ("interp", "malformed origin")
+
+        if parsed_mode == "left" or parsed_mode == "l":
+            parsed_mode = "l"
+        elif parsed_mode == "right" or parsed_mode == "r":
+            parsed_mode = "r"
+        else:
+            return ("interp", "malformed origin")
+
+        try:
+            verbal = False
+            for c in parsed_date:
+                if not c.isdigit():
+                    verbal = True
+                    break
+
+            if verbal:
+                delta = verbal_interpret(parsed_date, today)
+                if isinstance(delta, ValueError):
+                    return ("interp", "verbal interpretation error")
+                shifted_date = today + datetime.timedelta(days=delta)
+                assembly_year = shifted_date.year
+                assembly_month = shifted_date.month
+                assembly_day = shifted_date.day
+            else:
+                if len(parsed_date) == 4:
+                    assembly_month = int(parsed_date[0:2])
+                    assembly_day = parsed_date[2:4]
+                    if today_month < assembly_month:
+                        assembly_year = today_year + 1
+                    else:
+                        assembly_year = today_year
+                elif len(parsed_date) == 8:
+                    assembly_year = parsed_date[0:4]
+                    assembly_month = parsed_date[4:6]
+                    assembly_day = parsed_date[6:8]
+                else:
+                    return ("interp", "malformed date")
+        except Exception as ex:
+            return ex
+
+        try:
+            assembly_hour = parsed_time[0:2]
+            assembly_minute = parsed_time[2:4]
+        except Exception:
+            return ("interp", "malformed time")
+
+        try:
+            parsed_date_time = datetime.datetime(
+                int(assembly_year),
+                int(assembly_month),
+                int(assembly_day),
+                int(assembly_hour),
+                int(assembly_minute),
+            )
+            if parsed_date_time < datetime.datetime.now():
+                return ("interp", "date has passed")
+            else:
+                return [parsed_origin, parsed_date_time, parsed_mode]
+        except Exception as ex:
+            return ("interp", "date interpretaiton error")
+
+    except Exception as ex:
+        return ("unknown", "unknown runtime error")
+
+
+print(book_email_query_details_parser("sinchon sun 1333 right"))

@@ -1,6 +1,7 @@
 # custom
 import table_gen
 import server_interface
+import email_interface
 import auth_master
 
 # pip
@@ -23,12 +24,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # region constants
 # region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
+JSON_SUBFOLDER_NAME = "jsons"
+LOGS_SUBFOLDER_NAME = "logs"
 SCHEDULE_FILE_NAME = "schedule_multiuser.json"
-SCHEDULE_FILE_PATH = CURR_PATH + "\\" + SCHEDULE_FILE_NAME
+SCHEDULE_FILE_PATH = CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + SCHEDULE_FILE_NAME
 CONFIG_FILE_NAME = "config_multiuser.json"
-CONFIG_FILE_PATH = CURR_PATH + "\\" + CONFIG_FILE_NAME
+CONFIG_FILE_PATH = CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + CONFIG_FILE_NAME
 # endregion
-
 
 # region config file defined
 # region users
@@ -52,6 +54,8 @@ AUTH_SESSION_LENGTH = 60 * 5  # in seconds
 DEBUG = False  # enable debuggin mode
 CLEAN_SCHEDULE = False  # set clean schedule for debugging purposes
 IGNORE_3DAYS = True
+EMAIL_SERVER = True
+RUN_MAINLOOP = True
 # endregion
 # endregion
 
@@ -60,7 +64,7 @@ IGNORE_3DAYS = True
 START_DAY = None
 CONSOLE = None
 
-SHTTL_MPS = []  # global shuttle maps for all user
+SHTTL_MPS = []  # global shuttle maps for all users
 
 thread_clock_upd = None
 
@@ -91,8 +95,7 @@ EMPTY_SCHEDULE = {
 }
 
 DEFAULT_CONFIG = {
-    "USER_00": {**replaced ID using filter-repo**, **replaced PW using filter-repo**, main=False)
-    console_handler()
-
-
-startup()
+    "USER_00": {**replaced ID using filter-repo**, **replaced PW using filter-repo**,
+)
+print(eq)
+book_email_query_handler(eq)
