@@ -397,4 +397,35 @@ def book_email_query_details_parser(details):
         return ("unknown", "unknown runtime error")
 
 
-print(book_email_query_details_parser("sinchon sun 1333 right"))
+import os
+
+QUERY_DIR = "C:/Users/**replaced ALIAS using filter-repo**/Desktop/github/yshttl/program/book_queries"
+EMAIL = "**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**
+QUERY_PREFIX = "query_"
+
+#'{:_<10}'.format('test')
+# test______
+
+dirs = os.listdir(f"{QUERY_DIR}/{EMAIL}")
+
+
+if len(dirs) == 0:
+    index_formatted = "{:0<2}".format(int(0))
+    file = open(f"{QUERY_DIR}/{EMAIL}/{QUERY_PREFIX + index_formatted}.json", "w")
+else:
+    i = 0
+    while i < len(dirs):
+        dirs[i] = int(dirs[i].split("_")[1][:-5])
+        i += 1
+
+    i = 0
+    j = 0
+    while i < len(dirs):
+        if j < dirs[i]:
+            print(j)
+            break
+        i += 1
+        j += 1
+
+    index_formatted = "{:0>2}".format(int(j))
+    file = open(f"{QUERY_DIR}/{EMAIL}/{QUERY_PREFIX + index_formatted}.json", "w")

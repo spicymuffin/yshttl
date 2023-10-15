@@ -21,6 +21,8 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# region main program
+
 # region constants
 # region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -96,6 +98,6 @@ EMPTY_SCHEDULE = {
 
 DEFAULT_CONFIG = {
     "USER_00": {**replaced ID using filter-repo**, **replaced PW using filter-repo**,
-)
-print(eq)
-book_email_query_handler(eq)
+    # )
+    # print(eq)
+    # book_email_query_handler(eq)
