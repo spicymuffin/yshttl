@@ -1,0 +1,45 @@
+Date : 2023-10-16 04:42:51
+Directory : c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl
+Total : 14 files,  1143 codes, 127 comments, 254 blanks, all 1524 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Python   |          4 |      1,107 |        127 |        254 |      1,488 |
+| JSON     |         10 |         36 |          0 |          0 |         36 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                        | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                           |         14 |      1,143 |        127 |        254 |      1,524 |
+| . (Files)                                                                   |          2 |         22 |          0 |          0 |         22 |
+| program                                                                     |         10 |        842 |         72 |        194 |      1,108 |
+| program (Files)                                                             |          5 |        721 |         72 |        193 |        986 |
+| program\jsons                                                               |          5 |        121 |          0 |          1 |        122 |
+| python                                                                      |          1 |        196 |         55 |         58 |        309 |
+| samples                                                                     |          1 |         83 |          0 |          2 |         85 |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                    | language | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\credentials.json                       | JSON     |         12 |          0 |          0 |         12 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\config_multiuser.json          | JSON     |        -21 |          0 |          0 |        -21 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\email_interface.py             | Python   |         18 |          5 |          3 |         26 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\email_query_storage.json       | JSON     |          0 |          0 |         -1 |         -1 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\allowed_emails_list.json | JSON     |          8 |          0 |          0 |          8 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\config_email_server.json | JSON     |          6 |          0 |          0 |          6 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\config_multiuser.json    | JSON     |         21 |          0 |          0 |         21 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\email_query_storage.json | JSON     |          0 |          0 |          1 |          1 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\schedule_multiuser.json  | JSON     |         86 |          0 |          0 |         86 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\schedule_multiuser.json        | JSON     |        -86 |          0 |          0 |        -86 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\yshttl.py                      | Python   |        810 |         67 |        191 |      1,068 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\python\test.py                         | Python   |        196 |         55 |         58 |        309 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\samples\message_template.py            | Python   |         83 |          0 |          2 |         85 |
+| c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\token.json                             | JSON     |         10 |          0 |          0 |         10 |
+| Total                                                                       |          |      1,143 |        127 |        254 |      1,524 |
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+

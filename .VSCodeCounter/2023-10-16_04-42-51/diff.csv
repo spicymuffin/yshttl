@@ -1,0 +1,16 @@
+"filename", "language", "JSON", "Python", "comment", "blank", "total"
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\credentials.json", "JSON", 12, 0, 0, 0, 12
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\config_multiuser.json", "JSON", -21, 0, 0, 0, -21
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\email_interface.py", "Python", 0, 18, 5, 3, 26
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\email_query_storage.json", "JSON", 0, 0, 0, -1, -1
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\allowed_emails_list.json", "JSON", 8, 0, 0, 0, 8
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\config_email_server.json", "JSON", 6, 0, 0, 0, 6
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\config_multiuser.json", "JSON", 21, 0, 0, 0, 21
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\email_query_storage.json", "JSON", 0, 0, 0, 1, 1
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\jsons\schedule_multiuser.json", "JSON", 86, 0, 0, 0, 86
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\schedule_multiuser.json", "JSON", -86, 0, 0, 0, -86
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\program\yshttl.py", "Python", 0, 810, 67, 191, 1068
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\python\test.py", "Python", 0, 196, 55, 58, 309
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\samples\message_template.py", "Python", 0, 83, 0, 2, 85
+"c:\Users\**replaced ALIAS using filter-repo**\Desktop\github\yshttl\token.json", "JSON", 10, 0, 0, 0, 10
+"Total", "-", 36, 1107, 127, 254, 1524

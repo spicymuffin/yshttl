@@ -202,7 +202,8 @@ def send_email(_target_email, _subject, _body) -> int:
     if SERVICE == None:
         raise RuntimeError("email master is not initialized; SERVICE is None")
 
-    message = MIMEText(_body)
+    _body = "<pre>" + _body + "</pre>"
+    message = MIMEText(_body, "html")
     message["to"] = _target_email
     message["subject"] = _subject
     create_message = {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode()}
@@ -221,4 +222,10 @@ def send_email(_target_email, _subject, _body) -> int:
 
 if __name__ == "__main__":
     initalize()
-    send_email("**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**, "test email", "test body")
+    send_email(
+        "**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**,
+        "test email",
+        """<strong>
+<b>asd</b>
+</strong>""",
+    )

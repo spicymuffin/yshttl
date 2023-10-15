@@ -204,7 +204,6 @@ def book_email_query_details_parser(details):
         argument = list(argument)  # gotta be fast
         argument.reverse()
 
-        next_cnt = 0
         delta = 6 - today_weekday
         cache = ""
         while len(argument) != 0:
@@ -212,9 +211,7 @@ def book_email_query_details_parser(details):
             cache += letter
 
             if cache == "next":
-                if next_cnt != 0:
-                    delta += 7
-                next_cnt += 1
+                delta += 7
                 cache = ""
             elif cache == "mon":
                 delta += 1
@@ -397,6 +394,8 @@ def book_email_query_details_parser(details):
         return ("unknown", "unknown runtime error")
 
 
+print(book_email_query_details_parser("S nextthursday 1200 r"))
+
 import os
 
 QUERY_DIR = "C:/Users/**replaced ALIAS using filter-repo**/Desktop/github/yshttl/program/book_queries"
@@ -406,26 +405,52 @@ QUERY_PREFIX = "query_"
 #'{:_<10}'.format('test')
 # test______
 
-dirs = os.listdir(f"{QUERY_DIR}/{EMAIL}")
+# dirs = os.listdir(f"{QUERY_DIR}/{EMAIL}")
 
 
-if len(dirs) == 0:
-    index_formatted = "{:0<2}".format(int(0))
-    file = open(f"{QUERY_DIR}/{EMAIL}/{QUERY_PREFIX + index_formatted}.json", "w")
-else:
-    i = 0
-    while i < len(dirs):
-        dirs[i] = int(dirs[i].split("_")[1][:-5])
-        i += 1
+# if len(dirs) == 0:
+#     index_formatted = "{:0<2}".format(int(0))
+#     file = open(f"{QUERY_DIR}/{EMAIL}/{QUERY_PREFIX + index_formatted}.json", "w")
+# else:
+#     i = 0
+#     while i < len(dirs):
+#         dirs[i] = int(dirs[i].split("_")[1][:-5])
+#         i += 1
 
-    i = 0
-    j = 0
-    while i < len(dirs):
-        if j < dirs[i]:
-            print(j)
-            break
-        i += 1
-        j += 1
+#     i = 0
+#     j = 0
+#     while i < len(dirs):
+#         if j < dirs[i]:
+#             print(j)
+#             break
+#         i += 1
+#         j += 1
 
-    index_formatted = "{:0>2}".format(int(j))
-    file = open(f"{QUERY_DIR}/{EMAIL}/{QUERY_PREFIX + index_formatted}.json", "w")
+#     index_formatted = "{:0>2}".format(int(j))
+#     file = open(f"{QUERY_DIR}/{EMAIL}/{QUERY_PREFIX + index_formatted}.json", "w")
+
+def parse_serialized_date(_serialized_date) -> datetime.datetime:
+    splt = _serialized_date.split(" ")
+    assembly_date = splt[0]
+    assembly_time = splt[1]
+
+    assembly_date = assembly_date.split("-")
+    assembly_time = assembly_time.split(":")
+
+    assembly_year = assembly_date[0]
+    assembly_month = assembly_date[1]
+    assembly_day = assembly_date[2]
+
+    assembly_hour = assembly_time[0]
+    assembly_minute = assembly_time[1]
+
+    return datetime.datetime(
+        int(assembly_year),
+        int(assembly_month),
+        int(assembly_day),
+        int(assembly_hour),
+        int(assembly_minute),
+    )
+
+print(datetime.datetime.now().strftime("%F %T"))
+print(parse_serialized_date(datetime.datetime.now().strftime("%F %T")))
