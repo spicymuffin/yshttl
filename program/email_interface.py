@@ -102,20 +102,22 @@ def get_emails(_maxResults=10, _unread=True) -> list:
                 if d["name"] == "Date":
                     date = d["value"]
 
-            # The Body of the message is in Encrypted format. So, we have to decode it.
-            # Get the data and decode it with base 64 decoder.
-            data = payload["body"]["data"]
-            data = data.replace("-", "+").replace("_", "/")
-            decoded_data = base64.b64decode(data)
+            body = "<empty>"
+            if "data" in payload["body"].keys():
+                # The Body of the message is in Encrypted format. So, we have to decode it.
+                # Get the data and decode it with base 64 decoder.
+                data = payload["body"]["data"]
+                data = data.replace("-", "+").replace("_", "/")
+                decoded_data = base64.b64decode(data)
 
-            # Now, the data obtained is in lxml. So, we will parse
-            # it with BeautifulSoup library
-            soup = BeautifulSoup(decoded_data, "lxml")
+                # Now, the data obtained is in lxml. So, we will parse
+                # it with BeautifulSoup library
+                soup = BeautifulSoup(decoded_data, "lxml")
 
-            if soup.body is not None:
-                body = soup.body()
-            else:
-                body = "<empty>"
+                if soup.body is not None:
+                    body = soup.body()
+                else:
+                    body = "<empty>"
 
             # Parsing data a bit
             splt = sender.split(" <")
@@ -186,7 +188,7 @@ def get_emails(_maxResults=10, _unread=True) -> list:
                 ).execute()
 
         except Exception as ex:
-            print(ex)
+            print(f"email_interface: an error occured while retreiving emails: {ex}")
 
     return return_data
 
@@ -215,7 +217,7 @@ def send_email(_target_email, _subject, _body) -> int:
         # print(f'sent message to {message} Message Id: {message["id"]}')
         return 0
     except HTTPError as error:
-        print(f"email_interface: an error occurred: {error}")
+        print(f"email_interface: an error occurred while sending email: {error}")
         message = None
         return -1
 
