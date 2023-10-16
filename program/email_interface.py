@@ -103,6 +103,8 @@ def get_emails(_maxResults=10, _unread=True) -> list:
                     date = d["value"]
 
             body = "<empty>"
+            # "data" key not present
+            print (payload)
             if "data" in payload["body"].keys():
                 # The Body of the message is in Encrypted format. So, we have to decode it.
                 # Get the data and decode it with base 64 decoder.
@@ -224,10 +226,11 @@ def send_email(_target_email, _subject, _body) -> int:
 
 if __name__ == "__main__":
     initalize()
-    send_email(
-        "**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**,
-        "test email",
-        """<strong>
-<b>asd</b>
-</strong>""",
-    )
+#     send_email(
+#         "**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**,
+#         "test email",
+#         """<strong>
+# <b>asd</b>
+# </strong>""",
+#     )
+    print(get_emails(10, False))
