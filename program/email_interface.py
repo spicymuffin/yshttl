@@ -38,7 +38,9 @@ def initalize():
         if CREDS and CREDS.expired and CREDS.refresh_token:
             CREDS.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "credentials.json", SCOPES
+            )
             CREDS = flow.run_local_server(port=0)
 
         # Save the access token in token.pickle file for the next run
@@ -83,7 +85,9 @@ def get_emails(_maxResults=10, _unread=True) -> list:
 
     for msg in messages:
         # Get the message from its id
-        txt = SERVICE.users().messages().get(userId="me", id=msg["id"]).execute()
+        txt = (
+            SERVICE.users().messages().get(userId="me", id=msg["id"]).execute()
+        )
 
         # print(txt)
 
@@ -104,11 +108,24 @@ def get_emails(_maxResults=10, _unread=True) -> list:
 
             body = "<empty>"
             # "data" key not present
-            print (payload)
+            # print (payload)
             if "data" in payload["body"].keys():
                 # The Body of the message is in Encrypted format. So, we have to decode it.
                 # Get the data and decode it with base 64 decoder.
                 data = payload["body"]["data"]
+                data = data.replace("-", "+").replace("_", "/")
+                decoded_data = base64.b64decode(data)
+
+                # Now, the data obtained is in lxml. So, we will parse
+                # it with BeautifulSoup library
+                soup = BeautifulSoup(decoded_data, "lxml")
+
+                if soup.body is not None:
+                    body = soup.body()
+                else:
+                    body = "<empty>"
+            else:
+                data = payload["parts"][0]["body"]["data"]
                 data = data.replace("-", "+").replace("_", "/")
                 decoded_data = base64.b64decode(data)
 
@@ -186,11 +203,15 @@ def get_emails(_maxResults=10, _unread=True) -> list:
             # remove unread label (mark as read)
             if _unread:
                 SERVICE.users().messages().modify(
-                    userId="me", id=msg["id"], body={"removeLabelIds": ["UNREAD"]}
+                    userId="me",
+                    id=msg["id"],
+                    body={"removeLabelIds": ["UNREAD"]},
                 ).execute()
 
         except Exception as ex:
-            print(f"email_interface: an error occured while retreiving emails: {ex}")
+            print(
+                f"email_interface: an error occured while retreiving emails: {ex}"
+            )
 
     return return_data
 
@@ -210,27 +231,34 @@ def send_email(_target_email, _subject, _body) -> int:
     message = MIMEText(_body, "html")
     message["to"] = _target_email
     message["subject"] = _subject
-    create_message = {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode()}
+    create_message = {
+        "raw": base64.urlsafe_b64encode(message.as_bytes()).decode()
+    }
 
     try:
         message = (
-            SERVICE.users().messages().send(userId="me", body=create_message).execute()
+            SERVICE.users()
+            .messages()
+            .send(userId="me", body=create_message)
+            .execute()
         )
         # print(f'sent message to {message} Message Id: {message["id"]}')
         return 0
     except HTTPError as error:
-        print(f"email_interface: an error occurred while sending email: {error}")
+        print(
+            f"email_interface: an error occurred while sending email: {error}"
+        )
         message = None
         return -1
 
 
 if __name__ == "__main__":
     initalize()
-#     send_email(
-#         "**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**,
-#         "test email",
-#         """<strong>
-# <b>asd</b>
-# </strong>""",
-#     )
-    print(get_emails(10, False))
+    #     send_email(
+    #         "**replaced ALIAS using filter-repo****replaced EMAIL using filter-repo**,
+    #         "test email",
+    #         """<strong>
+    # <b>asd</b>
+    # </strong>""",
+    #     )
+    print(get_emails(1, False))
