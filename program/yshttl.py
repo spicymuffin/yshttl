@@ -29,9 +29,13 @@ CURR_PATH = os.path.dirname(os.path.abspath(__file__))
 JSON_SUBFOLDER_NAME = "jsons"
 LOGS_SUBFOLDER_NAME = "logs"
 SCHEDULE_FILE_NAME = "schedule_multiuser.json"
-SCHEDULE_FILE_PATH = CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + SCHEDULE_FILE_NAME
+SCHEDULE_FILE_PATH = (
+    CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + SCHEDULE_FILE_NAME
+)
 CONFIG_FILE_NAME = "config_multiuser.json"
-CONFIG_FILE_PATH = CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + CONFIG_FILE_NAME
+CONFIG_FILE_PATH = (
+    CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + CONFIG_FILE_NAME
+)
 # endregion
 
 # region config file defined
