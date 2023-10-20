@@ -1,0 +1,20 @@
+{
+    "recv_datetime": "2023-10-19 12:23:45",
+    "subject": "\ud83d\ude19",
+    "sender_name": "\"\uc2e0\uc11c\uc778\"",
+    "sender_email": "**replaced EMAIL using filter-repo**,
+    "body": "book\n**replaced USERID using filter-repo**\n700909sS@\nsinchon nextmonday 1030 r\n",
+    "authorized": true,
+    "elevated": false,
+    "query_data": {
+        "type": "book",
+        "id": "**replaced USERID using filter-repo**",
+        "pw": "700909sS@",
+        "book_details": "sinchon nextmonday 1030 r",
+        "book_arguments": {
+            "origin": "S",
+            "departure_datetime": "2023-10-30 10:30:00",
+            "mode": "r"
+        }
+    }
+}
