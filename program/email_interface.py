@@ -7,6 +7,7 @@ import os.path
 import base64
 import datetime
 from bs4 import BeautifulSoup
+import requests
 
 # Define the SCOPES. If modifying it, delete the token.pickle file.
 SCOPES = [
@@ -16,6 +17,24 @@ SCOPES = [
 
 CREDS = None
 SERVICE = None
+
+
+def refresh_token(client_id, client_secret, refresh_token):
+    params = {
+        "grant_type": "refresh_token",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "refresh_token": refresh_token,
+    }
+
+    authorization_url = "https://oauth2.googleapis.com/token"
+
+    r = requests.post(authorization_url, data=params)
+
+    if r.ok:
+        return r.json()["access_token"]
+    else:
+        return None
 
 
 def initalize():
@@ -38,9 +57,7 @@ def initalize():
         if CREDS and CREDS.expired and CREDS.refresh_token:
             CREDS.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             CREDS = flow.run_local_server(port=0)
 
         # Save the access token in token.pickle file for the next run
@@ -85,9 +102,7 @@ def get_emails(_maxResults=10, _unread=True) -> list:
 
     for msg in messages:
         # Get the message from its id
-        txt = (
-            SERVICE.users().messages().get(userId="me", id=msg["id"]).execute()
-        )
+        txt = SERVICE.users().messages().get(userId="me", id=msg["id"]).execute()
 
         # print(txt)
 
@@ -209,9 +224,7 @@ def get_emails(_maxResults=10, _unread=True) -> list:
                 ).execute()
 
         except Exception as ex:
-            print(
-                f"email_interface: an error occured while retreiving emails: {ex}"
-            )
+            print(f"email_interface: an error occured while retreiving emails: {ex}")
 
     return return_data
 
@@ -231,23 +244,16 @@ def send_email(_target_email, _subject, _body) -> int:
     message = MIMEText(_body, "html")
     message["to"] = _target_email
     message["subject"] = _subject
-    create_message = {
-        "raw": base64.urlsafe_b64encode(message.as_bytes()).decode()
-    }
+    create_message = {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
     try:
         message = (
-            SERVICE.users()
-            .messages()
-            .send(userId="me", body=create_message)
-            .execute()
+            SERVICE.users().messages().send(userId="me", body=create_message).execute()
         )
         # print(f'sent message to {message} Message Id: {message["id"]}')
         return 0
     except HTTPError as error:
-        print(
-            f"email_interface: an error occurred while sending email: {error}"
-        )
+        print(f"email_interface: an error occurred while sending email: {error}")
         message = None
         return -1
 
