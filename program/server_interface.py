@@ -748,8 +748,11 @@ def check_login(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
     except Exception as ex:
         print("error checking login data")
         return False
-    return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
-
+    try:
+        return True if d0["dmLoginConfirm"]["isLogin"] == "1" else False
+    except Exception as ex:
+        print("error checking login data")
+        return False
 
 def get_user_info(_WMONID=WMONID, _JSESSIONID=JSESSIONID):
     d0 = None
