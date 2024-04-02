@@ -152,3 +152,10 @@ cython_debug/
 #.idea/
 program/jsons/
 program/book_queries/
+credentials.json
+token.json
+token.pickle
+users_discontinued.json
+.VSCodeCounter
+logs
+
