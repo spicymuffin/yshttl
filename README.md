@@ -21,6 +21,7 @@ use command "help" to get started.
  
  ## configuration file values explanation:
    ***(its a json file that is automatically created on first launch)***
+   
    note that the configuration file contains configurations for multiple users.
    ### primary settings (the rest is set automatically)
    every user entry should be registered in this format:
@@ -139,7 +140,7 @@ note that schedules should follow exactly this format! (each user has its own sc
 }
 ```
 ### explanaiton:
-this schdule will book:  
+this schdule will book the following shuttles for USER_01:
  1. on monday (day of the week 0) from **S**inchon at available times BEFORE (mode = l) 9:30  
  2. on tuesday (day of the week 1) from **S**inchon at available times BEFORE (mode = l) 7:30  
  3. on tuesday (day of the week 1) from **I**nternational at available times AFTER (mode = r) 17:20  
