@@ -6,6 +6,14 @@
  4. show booked shuttles
  5. cancel booked shuttles (not implemented yet in ver. 2.2)
 
+ ## dependencies
+ ### you need to run these before first launch:
+ pip install google-auth-oauthlib
+ pip install bs4
+ pip install google-api-python-client
+ pip install rsa
+ pip install rich
+
  ## how to use
 run yshttl.py with python 3.11 or newer. use CLI to operate the program.
 
@@ -13,14 +21,20 @@ use command "help" to get started.
  
  ## configuration file values explanation:
    ***(its a json file that is automatically created on first launch)***
- ### primary settings (the rest is set automatically)
- 
-  * **USERID**: *string*  
-    yonsei portal id
-    
-  * **USERPW**: *string*  
-    yonsei portal password
-
+   note that the configuration file contains configurations for multiple users.
+   ### primary settings (the rest is set automatically)
+   every user entry should be registered in this format:
+   ```
+   "USER_XX": {
+       "ALIAS": "ALIAS",
+       "USERID": "20YYYYYYYY",
+       "USERPW": "PASSWORD"
+   }
+   ```
+   * ALIAS stands for the name that you want to use to address the user.
+   * where XX stands for a user's index with a leading zero.
+   * 20YYYYYYYY stands for the user's student id.
+   * PASSWORD stands for the user's portal password.
  ### secondary settings (touch if you know what you are doing)
  
   * **REFRESH_RATE_CLOCK**: *float*  
@@ -44,6 +58,10 @@ use command "help" to get started.
   * **AUTH_SESSION_LENGTH**: *float*  
     authentication session length  
     default: 300.0
+
+  * **EMAIL_SERVER**: *bool*
+    defines whether the emailserver should be turned on
+    default: false
  
  ### developer settings
  
@@ -61,59 +79,63 @@ use command "help" to get started.
     
 ## schedule file format:
 ***this is an example schedule (its a json file that is automatically created on first launch)***
+
+note that schedules should follow exactly this format! (each user has its own schedule) 
 ```
 {
-  "0": [
-    {
-      "origin": "S",
-      "time": "09:30",
-      "mode": "l"
+    "USER_00": {
+        "0": [
+            {
+                "origin": "S",
+                "time": "09:30",
+                "mode": "l"
+            }
+        ],
+        "1": [
+            {
+                "origin": "S",
+                "time": "07:40",
+                "mode": "l"
+            },
+            {
+                "origin": "I",
+                "time": "17:20",
+                "mode": "r"
+            },
+            {
+                "origin": "I",
+                "time": "17:30",
+                "mode": "r"
+            }
+        ],
+        "2": [
+            {
+                "origin": "S",
+                "time": "09:30",
+                "mode": "l"
+            }
+        ],
+        "3": [],
+        "4": [
+            {
+                "origin": "I",
+                "time": "15:00",
+                "mode": "l"
+            },
+            {
+                "origin": "I",
+                "time": "12:00",
+                "mode": "l"
+            },
+            {
+                "origin": "I",
+                "time": "18:00",
+                "mode": "l"
+            }
+        ],
+        "5": [],
+        "6": []
     }
-  ],
-  "1": [
-    {
-      "origin": "S",
-      "time": "07:40",
-      "mode": "l"
-    },
-    {
-      "origin": "I",
-      "time": "17:20",
-      "mode": "r"
-    },
-    {
-      "origin": "I",
-      "time": "17:30",
-      "mode": "r"
-    }
-  ],
-  "2": [
-    {
-      "origin": "S",
-      "time": "09:30",
-      "mode": "l"
-    }
-  ],
-  "3": [],
-  "4": [
-    {
-      "origin": "I",
-      "time": "15:00",
-      "mode": "l"
-    },
-    {
-      "origin": "I",
-      "time": "12:00",
-      "mode": "l"
-    },
-    {
-      "origin": "I",
-      "time": "18:00",
-      "mode": "l"
-    }
-  ],
-  "5": [],
-  "6": []
 }
 ```
 ### explanaiton:
