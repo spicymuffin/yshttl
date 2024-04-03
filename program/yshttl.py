@@ -26,8 +26,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # region constants
 # region file management
 CURR_PATH = os.path.dirname(os.path.abspath(__file__))
-JSON_SUBFOLDER_NAME = "jsons"
 LOGS_SUBFOLDER_NAME = "logs"
+JSON_SUBFOLDER_NAME = "jsons"
+JSON_SUBFOLDER_PATH = CURR_PATH + "\\" + JSON_SUBFOLDER_NAME
 SCHEDULE_FILE_NAME = "schedule_multiuser.json"
 SCHEDULE_FILE_PATH = (
     CURR_PATH + "\\" + JSON_SUBFOLDER_NAME + "\\" + SCHEDULE_FILE_NAME
@@ -101,8 +102,8 @@ EMPTY_SCHEDULE = {
 }
 
 DEFAULT_CONFIG = {
-    "USER_00": {"USERID": "", "USERPW": ""},
-    "CONFIG": {
+    "USER_CREDENTIALS": {"USER_00": {"ALIAS": "", "USERID": "", "USERPW": ""}},
+    "RUNOPT": {
         "REFRESH_RATE_CLOCK": 0.25,
         "REFRESH_RATE_SHTTL_LST": 30,
         "BOOK_TIME": "0 2 0",
@@ -110,6 +111,7 @@ DEFAULT_CONFIG = {
         "EMAIL_SERVER": False,
         "RUN_MAINLOOP": True,
         "AUTH_SESSION_LENGTH": 300,
+        "EMAIL_SERVER": False,
         "DEBUG": False,
         "CLEAN_SCHEDULE": False,
         "IGNORE_3DAYS": True,
@@ -2811,6 +2813,8 @@ def startup():
                 exit()
         # endregion
     else:
+        if (not os.path.exists(JSON_SUBFOLDER_PATH)):
+            os.mkdir(JSON_SUBFOLDER_PATH)
         # region empty config generation
         with open(CONFIG_FILE_PATH, "w+") as file:
             CONFIG = DEFAULT_CONFIG
