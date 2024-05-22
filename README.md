@@ -2,6 +2,7 @@
 
 a command-line tool that can:
 
+0.  exploit a bug in the yonsei shuttle booking system
 1.  auto-book yonsei shuttle based on a schedule
 2.  book shuttles before the official booking hour
 3.  make long term booking reservations (the program remembers to book in your stead)
