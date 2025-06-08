@@ -53,11 +53,11 @@ every user entry should be registered in this format:
 ### secondary settings (touch if you know what you are doing)
 
 - **REFRESH_RATE_CLOCK**: _float_  
-  time inbetween refreshes of clock thread  
+  time in between refreshes of clock thread  
   default: 0.25
 
 - **REFRESH_RATE_SHTTL_LST**: _float_  
-  time inbetween refreshes of shuttle list  
+  time in between refreshes of shuttle list  
   default: 30.0
 
 - **BOOK_TIME**: _string_  
@@ -88,7 +88,7 @@ every user entry should be registered in this format:
   default: false
 
 - **IGNORE_3DAYS**: _bool_  
-  if set to true first 3 days of schedule from start date will ignored  
+  if set to true first 3 days of the schedule from the start date will be ignored  
   default: true
 
 ## schedule file format:
@@ -155,9 +155,9 @@ note that schedules should follow exactly this format! (each user has its own sc
 }
 ```
 
-### explanaiton:
+### explanation:
 
-this schdule will book the following shuttles for USER_01:
+this schedule will book the following shuttles for USER_01:
 
 1.  on monday (day of the week 0) from **S**inchon at available times BEFORE (mode = l) 9:30
 2.  on tuesday (day of the week 1) from **S**inchon at available times BEFORE (mode = l) 7:30
