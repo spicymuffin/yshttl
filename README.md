@@ -95,7 +95,7 @@ every user entry should be registered in this format:
 
 **_this is an example schedule (its a json file that is automatically created on first launch)_**
 
-note that schedules should follow exactly this format! (each user has its own schedule)
+note that schedules should follow exactly this format! (each user has their own schedule)
 
 ```
 {
